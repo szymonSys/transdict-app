@@ -1,6 +1,6 @@
 from random import randint
 from app import db
-from app.models import User, Collection, Translation
+from app.models import User, Collection, Translation, TranslationStatus
 from werkzeug.security import generate_password_hash, check_password_hash
 import uuid
 
@@ -30,9 +30,29 @@ for i in range(1,400):
 
   translations.append(Translation(primaryPhrase=primaryPhrase,secondaryPhrase=secondaryPhrase,primaryLanguage=primaryLanguage,secondaryLanguage=secondaryLanguage))
   db.session.add(translations[len(translations)-1])
+  db.session.commit()
 
-  for j in range(1, randint(1, len(collections))):
-    collections[randint(0,j)].translations.append(translations[len(translations)-1])
+  half_len = (len(collections) // 2)
 
-db.session.commit()
+  if half_len > 20:
+    half_len = (len(collections) // 3)
+  elif half_len > 80:
+    half_len = (len(collections) // 5)
+  elif half_len > 140:
+    half_len = (len(collections) // 8)
+  elif half_len > 220:
+    half_len = (len(collections) // 10)
+  elif half_len > 300:
+    half_len = (len(collections) // 16)
 
+  random_range = randint(0, half_len)
+
+  for j in range(0, random_range):
+    collectionIndex = randint(0,len(collections)-1)
+    translationIndex = randint(0,len(translations)-1)
+    collections[collectionIndex].translations.append(translations[translationIndex])
+    # db.session.commit()
+    new_translation_status = TranslationStatus(collectionId=collections[collectionIndex].id, translationId=translations[translationIndex].id)
+    db.session.add(new_translation_status)
+
+# db.session.commit()

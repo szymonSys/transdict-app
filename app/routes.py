@@ -40,6 +40,9 @@ def create_user():
     })
 
 
+
+
+
 @app.route("/login", methods=['GET'])
 def login():
   if check_session():
@@ -65,6 +68,9 @@ def login():
   return make_response('Could not verify user', 401, {'WWW-Authenticate': 'Basic realm="Incorrect password"'})
 
 
+
+
+
 @app.route("/logout", methods=['GET'])
 @token_required
 def logout(current_user):
@@ -73,6 +79,9 @@ def logout(current_user):
     return jsonify({'message': 'You are logged out', 'isLoggedIn': False})
 
   return jsonify({'message': 'You are not logged in', 'isLoggedIn': False})
+
+
+
 
 
 @app.route("/user", methods=['GET'])
@@ -90,12 +99,98 @@ def get_user(current_user):
 
 
 
-@app.route("/user/collections/<int:collectionId>", methods=['GET'])
+
+
+@app.route("/user/collections/<string:collectionName>/update", methods=['POST', 'PUT', 'DELETE'])
 @token_required
-def get_collection(current_user, collectionId):
+def update_collection(current_user, collectionName):
   if not check_session():
 
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+
+  data = request.get_json()
+  request_collection_id = request.args.get('collectionId')
+
+  if request_collection_id == None:
+
+    return jsonify({'message': '"collectionId" argument has to be instance of Int', 'isUpdated': False})
+
+  target_collection =  None
+  target_collection = Collection.query.filter(db.and_(Collection.id==int(request_collection_id), Collection.userId==current_user.id)).first()
+  
+  if not target_collection:
+
+    return jsonify({'message': 'Not found collection named', 'isUpdated': False})
+
+  translation = Translation.query.filter(db.and_(Translation.primaryPhrase == data["primaryPhrase"], Translation.secondaryPhrase==data["secondaryPhrase"])).first()
+  
+  if request.args['action'] == 'add':
+    if not translation:
+      translation = Translation(
+        primaryPhrase=data["primaryPhrase"],
+        secondaryPhrase=data["secondaryPhrase"],
+        primaryLanguage=data["primaryLanguage"],
+        secondaryLanguage=data["secondaryLanguage"]
+        )
+    for translation_in_col in target_collection.translations:
+      if translation.primaryPhrase == translation_in_col.primaryPhrase and  translation.secondaryPhrase == translation_in_col.secondaryPhrase:
+
+        return jsonify({'message': 'You already have the same translation in this collection','isUpdated': False})
+    
+    db.session.add(translation)
+    db.session.commit()
+    target_collection.translations.append(translation)
+    new_translation_status = TranslationStatus(collectionId=target_collection.id,translationId=translation.id)
+    db.session.add(new_translation_status)
+    db.session.commit()
+
+    return jsonify({'isUpdated': True})
+
+  elif request.args['action'] == 'delete':
+    if request.args.get('translationId') == None:
+
+      return jsonify({'message': '"translationId" argument has to be instance of Int', 'isUpdated': False})
+    
+    target_translation = None
+
+    for translation_in_coll in target_collection.translations:
+      if translation_in_coll.id == int(request.args.get('translationId')):
+        target_translation = translation_in_coll
+        break
+
+    if not target_translation:
+
+      return jsonify({'message': 'Translation is not found', 'isUpdated': False})
+
+    translation_status = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==target_collection.id, TranslationStatus.translationId==target_translation.id)).first()
+
+    if translation_status:
+      db.session.delete(translation_status) 
+
+    target_collection.translations.remove(translation)
+    db.session.commit()
+
+    return jsonify({'isUpdated': True})
+
+  elif request.args['action'] == 'check':
+ 
+    translation_status = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==target_collection.id, TranslationStatus.translationId==translation.id)).first()
+    if not translation_status:
+
+      return jsonify({'message': 'Translation does not have any status', 'isUpdated': False})
+
+    translation_status.isLearned = not translation_status.isLearned
+    translation_status.updatedAt = datetime.datetime.now()
+    db.session.commit()
+
+    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': False})
+
+  else:
+
+    return jsonify({'message': 'Invalid request "action" argument', 'isUpdated': False})
+
+
+
 
 
 @app.route("/user/collections/new", methods=['POST'])
@@ -124,103 +219,42 @@ def add_collection(current_user):
 
   return jsonify({'isAdded': True})
 
-  
-@app.route("/user/collections/<string:collectionName>/update", methods=['POST', 'PUT', 'DELETE'])
+
+
+
+
+@app.route("/user/collections/<string:collectionName>/delete", methods=['DELETE'])
 @token_required
-def update_collection(current_user, collectionName):
+def delete_collection(current_user, collectionName):
   if not check_session():
 
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
 
-  data = request.get_json()
-  request_collection_id = request.args.get('collectionId')
+  collectionId = request.args.get('collectionId')
 
-  if request_collection_id == None:
+  if collectionId == None:
 
-    return jsonify({'message': '"collectionId" argument has to be instance of Int', 'isUpdated': False})
+    return jsonify({'message': 'Invalid request "collectionId" argument', 'isDeleted': False})
 
-  target_collection =  None
-  target_collection = Collection.query.filter(db.and_(Collection.id==int(request_collection_id), Collection.userId==current_user.id)).first()
-  
-  if not target_collection:
+  collection = Collection.query.filter(db.and_(Collection.id==collectionId, Collection.userId==current_user.id)).first()
 
-    return jsonify({'message': 'Not found collection named', 'isUpdated': False})
+  if not collection:
 
-  translation = Translation.query.filter(db.and_(Translation.primaryPhrase == data["primaryPhrase"], Translation.secondaryPhrase==data["secondaryPhrase"])).first()
-  
-  if translation:
-    translation_status = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==target_collection.id, TranslationStatus.translationId==translation.id)).first()
+    return jsonify({'message': 'Collection is not founded', 'isDeleted': False})
 
+  del_translations_statuses = TranslationStatus.query.filter_by(collectionId=collection.id).all()
 
-  if request.args['action'] == 'add':
-    if not translation:
-      translation = Translation(
-        primaryPhrase=data["primaryPhrase"],
-        secondaryPhrase=data["secondaryPhrase"],
-        primaryLanguage=data["primaryLanguage"],
-        secondaryLanguage=data["secondaryLanguage"]
-        )
-    for translation_in_col in target_collection.translations:
-      if translation.primaryPhrase == translation_in_col.primaryPhrase and  translation.secondaryPhrase == translation_in_col.secondaryPhrase:
+  if len(del_translations_statuses):
+    for del_trans_status in del_translations_statuses:
+      db.session.delete(del_trans_status)
 
-        return jsonify({'message': 'You already have the same translation in this collection','isUpdated': False})
-      db.session.add(translation)
+  db.session.delete(collection)
+  db.session.commit()
 
-    target_collection.translations.append(translation)
-    new_translation_status = TranslationStatus(collectionId=target_collection.id,translationId=translation.id)
-    db.session.add(new_translation_status)
-    db.session.commit()
-
-    return jsonify({'isUpdated': True})
-
-  elif request.args['action'] == 'delete':
-    if request.args.get('translationId') == None:
-
-      return jsonify({'message': '"translationId" argument has to be instance of Int', 'isUpdated': False})
-    
-    target_translation = None
-
-    for translation_in_coll in target_collection.translations:
-      if translation_in_coll.id == int(request.args.get('translationId')):
-        target_translation = translation_in_coll
-        break
-
-    if not target_translation:
-
-      return jsonify({'message': 'Translation is not found', 'isUpdated': False})
-
-    if translation_status:
-      db.session.delete(translation_status) 
-
-    target_collection.translations.remove(translation)
-    db.session.commit()
-
-    return jsonify({'isUpdated': True})
-
-  elif request.args['action'] == 'check':
- 
-    if not translation_status:
-
-      return jsonify({'message': 'Translation does not have any status', 'isUpdated': False})
-
-    translation_status.isLearned = not translation_status.isLearned
-    translation_status.updatedAt = datetime.datetime.now()
-    db.session.commit()
-
-    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': False})
-
-  else:
-
-    return jsonify({'message': 'Invalid request "action" argument', 'isUpdated': False})
+  return jsonify({'deletedCollectionId': collection.id, 'deletedCollectionName': collection.name, 'isDeleted': True})
 
 
 
-@app.route("/user/collections/<int:collectionId>/delete", methods=['DELETE'])
-@token_required
-def delete_collection(current_user, collectionId):
-  if not check_session():
-
-    return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
 
 
 @app.route("/user/collections", methods=['GET'])
@@ -237,7 +271,25 @@ def get_collections_with_limit_and_offset(current_user):
 
     return jsonify({'message': 'Invalid request. Please give correct limit and offset arguments', 'contentIsSent': False})
 
-  return jsonify({'limit': int(limit), 'offset': int(offset)})
+  collections = Collection.query.filter_by(userId=current_user.id).limit(limit).offset(offset).all()
+  response_collections = []
+
+  for collection in collections:
+    coll = {}
+    learned_quantity = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True)).count()
+    coll['name'] = collection.name
+    coll['id'] = collection.id
+    coll['createdAt'] = collection.createdAt
+    coll['updatedAt'] = collection.updatedAt
+    coll['translationsQauntity'] = len(collection.translations)
+    coll['learnedQuantity'] = learned_quantity
+
+    response_collections.append(coll)
+
+  return jsonify({'collections': response_collections,'limit': int(limit), 'offset': int(offset), 'contentIsSent': True})
+
+
+
 
 
 @app.route("/user/collections/<string:collectionName>", methods=['GET'])
@@ -254,6 +306,31 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
     if limit == None or offset == None or collectionId == None:
       
       return jsonify({'message': 'Invalid request. Limit, offset and collectionId arguments have to be instance of Ing', 'contentIsSent': False})
+
+    collection = Collection.query.with_entities(Collection.name, Collection.id, Collection.createdAt, Collection.updatedAt).filter(db.and_(Collection.id==collectionId,Collection.userId==current_user.id)).first()
+    translations_statuses = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==collection.id)).limit(limit).offset(offset).all()
+
+    if not collection:
+
+      return jsonify({'message': 'Collection is not found!', 'contentIsSent': False})
+
+    translations_response = []
+
+    for translation_status in translations_statuses:
+      translation = Translation.query.filter_by(id=translation_status.translationId).first()
+      trans = {}
+      trans['id'] = translation.id
+      trans['primatyLanguage'] = translation.primaryLanguage
+      trans['secondaryLanguage'] = translation.secondaryLanguage
+      trans['primatyPhrase'] = translation.primaryPhrase
+      trans['secondaryPhrase'] = translation.secondaryPhrase
+      trans['isLearned'] = translation_status.isLearned
+      trans['updatedAt'] = translation_status.updatedAt
+      trans['collectionId'] = translation_status.collectionId
+
+      translations_response.append(trans)
+    
+    return jsonify({'collectionName': collection.name, 'collectionId': collection.id, 'createdAt': collection.createdAt, 'updatedAt': collection.updatedAt, 'translations': translations_response, 'contentIsSent': True})
 
 
 
