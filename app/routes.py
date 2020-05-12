@@ -4,38 +4,59 @@ from app import db
 from app import hashing
 from app.models import User, Collection, Translation, TranslationStatus
 from app.session_handler import start_session, end_session, check_session
+from app.set_sort_direction import set_direction
 from app.token_authentication import token_required
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
 import datetime
 import uuid
 import jwt
+from sqlalchemy.sql import func
+
+
 
 @app.route("/sign-up", methods=['POST'])
 def create_user():
   if check_session():
 
-    return jsonify({'message': 'You already are logged in', 'isLoggedIn': True})
+    return jsonify({'message': 'You already are logged in', 'isSignedUp': False, 'isLoggedIn': True})
 
-  data = request.get_json()
-  hashed_password = generate_password_hash(data['password'], method='sha256')
+  data = request.get_json(silent=True, force=True)
+  password = data.get('password')
+  email = data.get('email')
+
+  if not (password or email):
+    return jsonify({'message': 'Invalid user data', 'isSignedUp': False, 'isLoggedIn': False})
+
+  hashed_password = generate_password_hash(password, method='sha256')
 
   try:
-    new_user = User(email=data['email'],password=hashed_password, publicId=str(uuid.uuid4()))
+    if User.query.filter_by(email=email).first():
+      return jsonify({
+    'message': 'The email provided is already taken',
+    'isSignedUp': False,
+    'isLoggedIn': False
+    })
+    
+    new_user = User(email=email,password=hashed_password, publicId=str(uuid.uuid4()))
     db.session.add(new_user)
     db.session.commit()
   except:
-
     return jsonify({
     'message': 'Signing up failed',
+    'isSignedUp': False,
+    'isLoggedIn': False
     })
 
-  token = jwt.encode({'publicId': new_user.publicId, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=90)}, app.config['SECRET_KEY'])
+  token = jwt.encode({'publicId': new_user.publicId, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1000)}, app.config['SECRET_KEY'])
   start_session(new_user.publicId)
 
   return jsonify({
     'message': 'You are signed up successfully!',
     'token': token.decode('UTF-8'),
+    'publicId': new_user.publicId,
+    'email': new_user.email,
+    'isSignedUp': True,
     'isLoggedIn': True
     })
 
@@ -43,29 +64,33 @@ def create_user():
 
 
 
-@app.route("/login", methods=['GET'])
+@app.route("/login", methods=['POST'])
 def login():
   if check_session():
 
     return jsonify({'message': 'You already are logged in', 'isLoggedIn': True})
 
-  auth = request.authorization
-  if not auth or not auth.username or not auth.password:
+  data = request.get_json(silent=True, force=True)
+  email = data.get('email')
+  password = data.get('password')
 
-    return make_response('Could not verify user', 401, {'WWW-Authenticate': 'Basic realm="Login required"'})
+  if not email or not password:
 
-  user = User.query.filter_by(email=auth.username).first()
+    return jsonify({'message':'Could not verify user', 'isLoggedIn': False})
+
+  user = User.query.filter_by(email=email).first()
   if not user:
 
-    return make_response('There is not these user', 401, {'WWW-Authenticate': 'Basic realm="Not found user"'})
+    return jsonify({'message':'There is not these user', 'isLoggedIn': False})
 
-  if check_password_hash(user.password, auth.password):
-    token = jwt.encode({'publicId': user.publicId, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=90)}, app.config['SECRET_KEY'])
+  if check_password_hash(user.password, password):
+    token = jwt.encode({'publicId': user.publicId, 'exp' : datetime.datetime.utcnow() + datetime.timedelta(minutes=1000)}, app.config['SECRET_KEY'])
     start_session(user.publicId)
 
-    return jsonify({'token': token.decode('UTF-8'), 'isLoggedIn': True})
+    return jsonify({'message': 'Logging in success!','token': token.decode('UTF-8'), 'isLoggedIn': True, 'publicId': user.publicId,
+    'email': user.email})
 
-  return make_response('Could not verify user', 401, {'WWW-Authenticate': 'Basic realm="Incorrect password"'})
+  return jsonify({'message': 'Incorrect password', 'isLoggedIn': False})
 
 
 
@@ -82,19 +107,18 @@ def logout(current_user):
 
 
 
-
-
 @app.route("/user", methods=['GET'])
 @token_required
 def get_user(current_user):
   if not check_session():
 
-    return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+    return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False, 'isAuthenticated': False})
 
   return jsonify({
+    'message': 'authentication success!',
     'publicId': current_user.publicId,
     'email': current_user.email,
-    'createdAt': current_user.createdAt
+    'isAuthenticated': True,
     })
 
 
@@ -108,8 +132,19 @@ def update_collection(current_user, collectionName):
 
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
 
-  data = request.get_json()
+  data = request.get_json(silent=True, force=True)
+
+  if data == None:
+    data = {}
+
+  request_action = request.args.get('action')
   request_collection_id = request.args.get('collectionId')
+  request_translation_id = request.args.get('translationId')
+
+  primaryLanguage = data.get('primaryLanguage')
+  secondaryLanguage = data.get('secondaryLanguage')
+  primaryPhrase = data.get('primaryPhrase')
+  secondaryPhrase = data.get('secondaryPhrase')
 
   if request_collection_id == None:
 
@@ -117,21 +152,23 @@ def update_collection(current_user, collectionName):
 
   target_collection =  None
   target_collection = Collection.query.filter(db.and_(Collection.id==int(request_collection_id), Collection.userId==current_user.id)).first()
-  
+
   if not target_collection:
 
     return jsonify({'message': 'Not found collection named', 'isUpdated': False})
 
-  translation = Translation.query.filter(db.and_(Translation.primaryPhrase == data["primaryPhrase"], Translation.secondaryPhrase==data["secondaryPhrase"])).first()
-  
-  if request.args['action'] == 'add':
+
+  if request_action == 'add':
+    translation = Translation.query.filter(db.and_(Translation.primaryPhrase == primaryPhrase, Translation.secondaryPhrase==secondaryPhrase)).first()
+
     if not translation:
       translation = Translation(
-        primaryPhrase=data["primaryPhrase"],
-        secondaryPhrase=data["secondaryPhrase"],
-        primaryLanguage=data["primaryLanguage"],
-        secondaryLanguage=data["secondaryLanguage"]
+        primaryPhrase=primaryPhrase,
+        secondaryPhrase=secondaryPhrase,
+        primaryLanguage=primaryLanguage,
+        secondaryLanguage=secondaryLanguage
         )
+
     for translation_in_col in target_collection.translations:
       if translation.primaryPhrase == translation_in_col.primaryPhrase and  translation.secondaryPhrase == translation_in_col.secondaryPhrase:
 
@@ -146,7 +183,7 @@ def update_collection(current_user, collectionName):
 
     return jsonify({'isUpdated': True})
 
-  elif request.args['action'] == 'delete':
+  elif request_action == 'delete':
     if request.args.get('translationId') == None:
 
       return jsonify({'message': '"translationId" argument has to be instance of Int', 'isUpdated': False})
@@ -154,7 +191,7 @@ def update_collection(current_user, collectionName):
     target_translation = None
 
     for translation_in_coll in target_collection.translations:
-      if translation_in_coll.id == int(request.args.get('translationId')):
+      if translation_in_coll.id == int(request_translation_id):
         target_translation = translation_in_coll
         break
 
@@ -172,9 +209,10 @@ def update_collection(current_user, collectionName):
 
     return jsonify({'isUpdated': True})
 
-  elif request.args['action'] == 'check':
+  elif request_action == 'check':
  
-    translation_status = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==target_collection.id, TranslationStatus.translationId==translation.id)).first()
+    translation_status = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==target_collection.id, TranslationStatus.translationId==request_translation_id)).first()
+
     if not translation_status:
 
       return jsonify({'message': 'Translation does not have any status', 'isUpdated': False})
@@ -183,7 +221,7 @@ def update_collection(current_user, collectionName):
     translation_status.updatedAt = datetime.datetime.now()
     db.session.commit()
 
-    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': False})
+    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': True})
 
   else:
 
@@ -198,7 +236,7 @@ def update_collection(current_user, collectionName):
 def add_collection(current_user):
   if not check_session():
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
-  request_data = request.get_json()
+  request_data = request.get_json(silent=True, force=True)
   if not (request_data or request_data['name']):
 
     return jsonify({'message': 'Something went wrong!', 'isAdded': False})
@@ -266,25 +304,34 @@ def get_collections_with_limit_and_offset(current_user):
 
   limit = request.args.get('limit')
   offset = request.args.get('offset')
+  sort_by = request.args.get('sortBy')
+  sort_direction = request.args.get('sortDirection')
 
   if limit == None or offset == None:
 
     return jsonify({'message': 'Invalid request. Please give correct limit and offset arguments', 'contentIsSent': False})
 
-  collections = Collection.query.filter_by(userId=current_user.id).limit(limit).offset(offset).all()
+  order_by_options = {"name": Collection.name, "translationsQuantity": 'total', "learnedQuantity": 'learned',"createdAt": Collection.createdAt, "updatedAt": Collection.updatedAt, "id": Collection.id,}
+
+  order_by = order_by_options.get(sort_by)
+
+  learned_by_collection_sq = db.session.query(Collection.id.label('c_id'), func.count(TranslationStatus.id).label('learned')).outerjoin(Collection, Collection.id==TranslationStatus.collectionId).filter(db.and_(TranslationStatus.isLearned==True, Collection.userId==current_user.id)).group_by(Collection.id).subquery()
+
+  
+  collections = db.session.query(Collection, func.count(TranslationStatus.id).label('total'), learned_by_collection_sq.c.learned.label('learned')).outerjoin(Collection, Collection.id == TranslationStatus.collectionId).outerjoin(learned_by_collection_sq , Collection.id==learned_by_collection_sq.c.c_id).filter(db.and_(Collection.userId==current_user.id)).group_by(Collection).order_by(set_direction(sort_direction)(order_by)).all()
+
   response_collections = []
 
-  for collection in collections:
-    coll = {}
-    learned_quantity = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True)).count()
-    coll['name'] = collection.name
-    coll['id'] = collection.id
-    coll['createdAt'] = collection.createdAt
-    coll['updatedAt'] = collection.updatedAt
-    coll['translationsQauntity'] = len(collection.translations)
-    coll['learnedQuantity'] = learned_quantity
+  for collection_data in collections:
+    collection = {}
+    collection['name'] = collection_data[0].name
+    collection['id'] = collection_data[0].id
+    collection['createdAt'] = collection_data[0].createdAt
+    collection['updatedAt'] = collection_data[0].updatedAt
+    collection['translationsQauntity'] = collection_data[1]
+    collection['learnedQuantity'] = collection_data[2]
 
-    response_collections.append(coll)
+    response_collections.append(collection)
 
   return jsonify({'collections': response_collections,'limit': int(limit), 'offset': int(offset), 'contentIsSent': True})
 
@@ -301,14 +348,23 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
 
     limit = request.args.get('limit')
     offset = request.args.get('offset')
+    sort_by = request.args.get('sortBy')
     collectionId = request.args.get('collectionId')
+    sort_direction = request.args.get('sortDirection')
 
     if limit == None or offset == None or collectionId == None:
       
       return jsonify({'message': 'Invalid request. Limit, offset and collectionId arguments have to be instance of Ing', 'contentIsSent': False})
 
     collection = Collection.query.with_entities(Collection.name, Collection.id, Collection.createdAt, Collection.updatedAt).filter(db.and_(Collection.id==collectionId,Collection.userId==current_user.id)).first()
-    translations_statuses = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId==collection.id)).limit(limit).offset(offset).all()
+
+
+    order_by_options = {"primaryPhrase": Translation.primaryPhrase, "secondaryPhrase": Translation.secondaryPhrase, "createdAt": TranslationStatus.createdAt, "updatedAt": TranslationStatus.updatedAt, "id": Translation.id,}
+
+    order_by = order_by_options.get(sort_by)
+
+    translations = db.session.query(Translation, TranslationStatus).outerjoin(TranslationStatus, Translation.id == TranslationStatus.translationId).filter(db.and_(TranslationStatus.collectionId==collection.id)).order_by(set_direction(sort_direction)(order_by)).limit(limit).offset(offset).all()
+
 
     if not collection:
 
@@ -316,17 +372,16 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
 
     translations_response = []
 
-    for translation_status in translations_statuses:
-      translation = Translation.query.filter_by(id=translation_status.translationId).first()
+    for translation in translations:
       trans = {}
-      trans['id'] = translation.id
-      trans['primatyLanguage'] = translation.primaryLanguage
-      trans['secondaryLanguage'] = translation.secondaryLanguage
-      trans['primatyPhrase'] = translation.primaryPhrase
-      trans['secondaryPhrase'] = translation.secondaryPhrase
-      trans['isLearned'] = translation_status.isLearned
-      trans['updatedAt'] = translation_status.updatedAt
-      trans['collectionId'] = translation_status.collectionId
+      trans['id'] = translation[0].id
+      trans['primatyLanguage'] = translation[0].primaryLanguage
+      trans['secondaryLanguage'] = translation[0].secondaryLanguage
+      trans['primaryPhrase'] = translation[0].primaryPhrase
+      trans['secondaryPhrase'] = translation[0].secondaryPhrase
+      trans['isLearned'] = translation[1].isLearned
+      trans['updatedAt'] = translation[1].updatedAt
+      trans['collectionId'] = translation[1].collectionId
 
       translations_response.append(trans)
     

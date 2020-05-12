@@ -6,7 +6,6 @@ def check_session():
   return False
 
 def end_session():
-  print(check_session())
   if check_session():
     session.pop('publicId', None)
     return True
