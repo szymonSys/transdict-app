@@ -9,12 +9,12 @@ import { useAuthentication } from "./shared/hooks";
 import LogoutButton from "./components/LogoutButton";
 
 function App() {
-  const isAuthenticated = useAuthentication();
+  const isAuthenticating = useAuthentication();
 
   return (
     <div className="App">
       <LogoutButton />
-      {!isAuthenticated ? (
+      {!isAuthenticating ? (
         <h2>Waiting...</h2>
       ) : (
         <Switch>

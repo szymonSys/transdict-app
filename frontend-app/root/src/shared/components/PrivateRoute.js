@@ -1,9 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
-import { authenticate } from "../../actions/auth";
 
-function PrivateRoute({ component: Component, authenticate, auth, ...rest }) {
+function PrivateRoute({ component: Component, auth, ...rest }) {
   return (
     <Route
       {...rest}
@@ -12,7 +11,7 @@ function PrivateRoute({ component: Component, authenticate, auth, ...rest }) {
         return !auth.isAuthenticated ? (
           <Redirect to="login" />
         ) : (
-          <Component {...props} />
+          <Component {...props} auth={auth} />
         );
       }}
     />
@@ -20,8 +19,5 @@ function PrivateRoute({ component: Component, authenticate, auth, ...rest }) {
 }
 
 const mapStateToProps = (state) => ({ auth: state.auth });
-const mapDispatchToProps = (dispatch) => ({
-  authenticate: () => dispatch(authenticate()),
-});
 
-export default connect(mapStateToProps, mapDispatchToProps)(PrivateRoute);
+export default connect(mapStateToProps)(PrivateRoute);

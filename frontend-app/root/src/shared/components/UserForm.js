@@ -77,10 +77,7 @@ const UserForm = ({
       </div>
       <div>
         <label htmlFor="login-password-input">password</label>
-        {hintShouldDisplay(
-          "password",
-          "Should contain 5-24 characters and at least 1: digit, upper case, lower case."
-        )}
+        {hintShouldDisplay("password", "Should contain 5-24 characters")}
         <div>
           <input
             type={passwordIsHidden ? "password" : "text"}

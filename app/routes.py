@@ -4,14 +4,15 @@ from app import db
 from app import hashing
 from app.models import User, Collection, Translation, TranslationStatus
 from app.session_handler import start_session, end_session, check_session
+from app.list_to_string import list_to_string
 from app.set_sort_direction import set_direction
 from app.token_authentication import token_required
 from secrets import token_urlsafe
 from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy.sql import func
 import datetime
 import uuid
 import jwt
-from sqlalchemy.sql import func
 
 
 
@@ -125,9 +126,9 @@ def get_user(current_user):
 
 
 
-@app.route("/user/collections/<string:collectionName>/update", methods=['POST', 'PUT', 'DELETE'])
+@app.route("/user/collections/update", methods=['POST', 'PUT', 'DELETE'])
 @token_required
-def update_collection(current_user, collectionName):
+def update_collection(current_user):
   if not check_session():
 
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
@@ -204,7 +205,7 @@ def update_collection(current_user, collectionName):
     if translation_status:
       db.session.delete(translation_status) 
 
-    target_collection.translations.remove(translation)
+    target_collection.translations.remove(target_translation)
     db.session.commit()
 
     return jsonify({'isUpdated': True})
@@ -261,9 +262,9 @@ def add_collection(current_user):
 
 
 
-@app.route("/user/collections/<string:collectionName>/delete", methods=['DELETE'])
+@app.route("/user/collections/delete", methods=['DELETE'])
 @token_required
-def delete_collection(current_user, collectionName):
+def delete_collection(current_user):
   if not check_session():
 
     return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
@@ -339,12 +340,13 @@ def get_collections_with_limit_and_offset(current_user):
 
 
 
-@app.route("/user/collections/<string:collectionName>", methods=['GET'])
+@app.route("/user/collection/translations", methods=['GET'])
 @token_required
-def get_translations_with_limit_and_offset(current_user, collectionName):
+def get_translations_with_limit_and_offset(current_user):
     if not check_session():
 
       return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+
 
     limit = request.args.get('limit')
     offset = request.args.get('offset')
@@ -358,6 +360,9 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
 
     collection = Collection.query.with_entities(Collection.name, Collection.id, Collection.createdAt, Collection.updatedAt).filter(db.and_(Collection.id==collectionId,Collection.userId==current_user.id)).first()
 
+    if not collection:
+
+      return jsonify({'message': 'Collection is not found!', 'contentIsSent': False})
 
     order_by_options = {"primaryPhrase": Translation.primaryPhrase, "secondaryPhrase": Translation.secondaryPhrase, "createdAt": TranslationStatus.createdAt, "updatedAt": TranslationStatus.updatedAt, "id": Translation.id,}
 
@@ -365,10 +370,6 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
 
     translations = db.session.query(Translation, TranslationStatus).outerjoin(TranslationStatus, Translation.id == TranslationStatus.translationId).filter(db.and_(TranslationStatus.collectionId==collection.id)).order_by(set_direction(sort_direction)(order_by)).limit(limit).offset(offset).all()
 
-
-    if not collection:
-
-      return jsonify({'message': 'Collection is not found!', 'contentIsSent': False})
 
     translations_response = []
 
@@ -386,6 +387,87 @@ def get_translations_with_limit_and_offset(current_user, collectionName):
       translations_response.append(trans)
     
     return jsonify({'collectionName': collection.name, 'collectionId': collection.id, 'createdAt': collection.createdAt, 'updatedAt': collection.updatedAt, 'translations': translations_response, 'contentIsSent': True})
+
+
+
+
+@app.route("/user/translations", methods=['POST'])
+@token_required
+def get_translations_by_ids(current_user):
+    if not check_session():
+
+      return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+
+
+    collectionId = request.args.get('collectionId')
+    data = request.get_json(silent=True, force=True)
+
+    if not data or not collectionId:
+
+      return jsonify({'message': 'No data to download', 'contentIsSent': False})
+
+    translations_ids = data.get('translationsIds')
+
+    if not isinstance(translations_ids, (list, tuple)) or  not len(translations_ids):
+
+      return jsonify({'message': 'translationsIds must be a non-empty list or tuple', 'contentIsSent': False})
+
+    translations_statuses = TranslationStatus.query.filter(db.and_(TranslationStatus.collectionId == collectionId, TranslationStatus.translationId.in_(translations_ids))).all()
+
+    translations_response = []
+
+    for translation_status in translations_statuses:
+      translation = {}
+      translation['id'] = translation_status.translation.id
+      translation['primatyLanguage'] = translation_status.translation.primaryLanguage
+      translation['secondaryLanguage'] = translation_status.translation.secondaryLanguage
+      translation['primaryPhrase'] = translation_status.translation.primaryPhrase
+      translation['secondaryPhrase'] = translation_status.translation.secondaryPhrase
+      translation['isLearned'] = translation_status.isLearned
+      translation['updatedAt'] = translation_status.updatedAt
+      translation['collectionId'] = translation_status.collectionId
+      translations_response.append(translation)
+
+    return jsonify({'translations': translations_response, 'contentIsSent': True})
+
+
+
+@app.route("/user/collection/translationsIds", methods=['GET'])
+@token_required
+def getAllTranslationsIdsFromCollection(current_user):
+    if not check_session():
+      return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+
+    collectionId = request.args.get('collectionId')
+    areLearned = request.args.get('areLearned')
+
+    if not collectionId:
+
+      return jsonify({'message': 'No data to download', 'contentIsSent': False})
+
+    query_resoult = db.session.query(TranslationStatus.translationId).outerjoin(Collection, Collection.id == TranslationStatus.collectionId).filter(db.and_(TranslationStatus.collectionId == collectionId, Collection.userId == current_user.id))
+
+    if areLearned != None:
+      boolIsLearned = False
+      if areLearned == 'true': 
+        boolIsLearned = True
+
+      query_resoult = query_resoult.filter(TranslationStatus.isLearned==boolIsLearned)
+
+    query_resoult = query_resoult.all()
+
+    translationsIds = []
+
+    for row in query_resoult:
+      translationsIds.append(row[0])
+
+
+    return jsonify({'translationsIds': translationsIds, 'isSent': True})
+
+
+
+
+
 
 
 

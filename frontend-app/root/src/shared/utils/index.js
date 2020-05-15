@@ -14,3 +14,22 @@ export async function handleFetch(url, requestOptions) {
     return { error: err };
   }
 }
+
+export const setUrlParams = (params = {}) => {
+  if (!checkType("object", params))
+    throw Error("params must be type of object");
+
+  const urlArgsString = Object.keys(params).reduce(
+    (acumulator, currentKey) =>
+      (acumulator +=
+        (checkType("string", params[currentKey]) ||
+          checkType("boolean", params[currentKey]) ||
+          checkType("number", params[currentKey])) &&
+        params[currentKey] !== ""
+          ? `&${currentKey}=${params[currentKey]}`
+          : ""),
+    ""
+  );
+
+  return urlArgsString;
+};

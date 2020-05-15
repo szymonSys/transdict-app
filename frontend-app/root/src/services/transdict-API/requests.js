@@ -4,17 +4,20 @@ import {
   ADD_TRANSLATION,
   DELETE_TRANSLATION,
   BY_DEFAULT,
+  DEFAULT_ORDER,
 } from "./actionsTypes";
 import {
   getLoginURL,
   getLogoutURL,
   getSignUpURL,
-  getTranslationFromCollectionURL,
+  getTranslationsFromCollectionURL,
+  getTranslationsByIdsURL,
   getUpdateCollectionsURL,
   getUserCollectionsURL,
   getDeleteCollectionURL,
   getNewCollectionURL,
   getUserURL,
+  getAllTranslationsIdsURL,
 } from "./urls";
 
 export function login(email = null, password = null) {
@@ -41,9 +44,9 @@ export function authenticate(token = null) {
 
 export function updateCollection(
   token = null,
-  action = null,
-  { collectionId = null, collectionName = null, translationId = null } = {},
+  { action = null, collectionId = null } = {},
   {
+    translationId = null,
     primaryPhrase = null,
     secondaryPhrase = null,
     primaryLanguage = null,
@@ -53,7 +56,6 @@ export function updateCollection(
   return handleRequest(
     getUpdateCollectionsURL({
       collectionId,
-      collectionName,
       translationId,
       action,
     }),
@@ -81,48 +83,70 @@ export function addCollection(
   });
 }
 
-export function deleteCollection(
-  token = null,
-  { collectionId = null, collectionName = null } = {}
-) {
-  return handleRequest(
-    getDeleteCollectionURL({ collectionId, collectionName }),
-    {
-      method: "DELETE",
-      token,
-    }
-  );
+export function deleteCollection(token = null, { collectionId = null } = {}) {
+  return handleRequest(getDeleteCollectionURL({ collectionId }), {
+    method: "DELETE",
+    token,
+  });
 }
 
 export function getUserCollections(
   token = null,
-  { limit = 10, offset = 0, sortBy = BY_DEFAULT } = {}
+  {
+    limit = 10,
+    offset = 0,
+    sortBy = BY_DEFAULT,
+    sortDirection = DEFAULT_ORDER,
+  } = {}
 ) {
-  return handleRequest(getUserCollectionsURL({ limit, offset, sortBy }), {
-    token,
-  });
+  return handleRequest(
+    getUserCollectionsURL({ limit, offset, sortBy, sortDirection }),
+    {
+      token,
+    }
+  );
 }
 
 export function getTranslationsFromCollection(
   token = null,
   {
     collectionId = null,
-    collectionName = null,
     limit = 10,
     offset = 0,
     sortBy = BY_DEFAULT,
+    sortDirection = DEFAULT_ORDER,
   } = {}
 ) {
   return handleRequest(
-    getTranslationFromCollectionURL({
+    getTranslationsFromCollectionURL({
       collectionId,
-      collectionName,
       limit,
       offset,
       sortBy,
+      sortDirection,
     }),
-    { token }
+    { method: "GET", token }
   );
+}
+
+export function getTranslationsByIds(
+  token = null,
+  { collectionId = null, translationsIds = [] } = {}
+) {
+  return handleRequest(getTranslationsByIdsURL({ collectionId }), {
+    method: "POST",
+    token,
+    requestData: { translationsIds },
+  });
+}
+
+export function getAllTranslationsIds(
+  token = null,
+  { collectionId = null, areLearned = null } = {}
+) {
+  return handleRequest(getAllTranslationsIdsURL({ collectionId, areLearned }), {
+    token,
+  });
 }
 
 const _setMethod = (action) => {

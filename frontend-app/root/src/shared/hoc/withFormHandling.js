@@ -92,7 +92,7 @@ const WithFormHandling = (
       /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
     const validPassword = (password = inputsState.password) =>
-      /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{5,24}$/.test(password);
+      /^[0-9a-zA-Z]{5,24}$/.test(password);
 
     const validUserData = () =>
       setIsValid({
@@ -150,6 +150,7 @@ const actions = { login, register };
 const matchAction = (actionName) => {
   if (typeof actionName !== "string")
     throw new Error("action name must be the string");
+
   return actions[actionName];
 };
 
