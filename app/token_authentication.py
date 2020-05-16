@@ -14,14 +14,14 @@ def token_required(func):
     
     if not token:
       end_session()
-      return jsonify({'message': 'Token is missing!', 'isAuthenticated:': False}), 401
+      return jsonify({'message': 'Token is missing!', 'isAuthenticated:': False})
 
     try:
       data = jwt.decode(token, app.config['SECRET_KEY'])
       current_user = User.query.filter_by(publicId=data['publicId']).first()
     except:
       end_session()
-      return jsonify({'message': 'Token is invalid!', 'isAuthenticated:': False}), 401
+      return jsonify({'message': 'Token is invalid!', 'isAuthenticated:': False})
 
     return func(current_user, *args, **kwargs)
 

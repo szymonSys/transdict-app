@@ -145,9 +145,7 @@ const WithFormHandling = (
   return connect(mapStateToProps, mapDispatchToProps)(Wrapper);
 };
 
-const actions = { login, register };
-
-const matchAction = (actionName) => {
+const matchAction = (actionName, actions = { login, register }) => {
   if (typeof actionName !== "string")
     throw new Error("action name must be the string");
 

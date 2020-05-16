@@ -60,7 +60,7 @@ export function updateCollection(
       action,
     }),
     {
-      method: _setMethod(action),
+      method: setHttpMethod(action),
       token,
       requestData: {
         primaryPhrase,
@@ -149,7 +149,7 @@ export function getAllTranslationsIds(
   });
 }
 
-const _setMethod = (action) => {
+const setHttpMethod = (action) => {
   switch (action) {
     case ADD_TRANSLATION:
       return "POST";

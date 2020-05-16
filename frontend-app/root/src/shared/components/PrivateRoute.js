@@ -3,13 +3,14 @@ import { connect } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 
 function PrivateRoute({ component: Component, auth, ...rest }) {
+  console.log("collection");
   return (
     <Route
       {...rest}
       render={(props) => {
         if (auth.isAuthenticating) return <h2>Loading...</h2>;
         return !auth.isAuthenticated ? (
-          <Redirect to="login" />
+          <Redirect to="/login" />
         ) : (
           <Component {...props} auth={auth} />
         );

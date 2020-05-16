@@ -8,10 +8,10 @@ import {
   useParams,
 } from "react-router-dom";
 
-export default function CollectionView() {
+export default function FlashcardsView() {
   return (
     <div>
-      <p>CollectionView</p>
+      <p>FlashcardsView</p>
     </div>
   );
 }
