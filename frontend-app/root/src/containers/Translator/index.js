@@ -16,8 +16,10 @@ import {
 
 import { useTimeout } from "../../shared/hooks/useTime";
 import useSwitch from "../../shared/hooks/useSwitch";
+import { translate } from "../../actions/phrases";
+import { connect } from "react-redux";
 
-export default function Translator(props) {
+function Translator({ translate, phrase }) {
   const location = useLocation();
   const [languages, reverseLanguages, setLanguages] = useSwitch([
     Math.floor(Math.random() * 10),
@@ -26,7 +28,7 @@ export default function Translator(props) {
 
   return (
     <div>
-      {console.log("render")}
+      {console.log(phrase)}
       <button onClick={reverseLanguages}>switch</button>
       <button
         onClick={() =>
@@ -42,6 +44,16 @@ export default function Translator(props) {
         {languages[0]} {languages[1]}
       </h2>
       <p>Translator</p>
+      <button onClick={() => translate("cześć", { to: "en" })}>
+        translate
+      </button>
     </div>
   );
 }
+
+const mapStateToProps = (state) => ({ phrase: state.phrases });
+const mapDispatchToProps = (dispatch) => ({
+  translate: (text, options) => dispatch(translate(text, options)),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Translator);

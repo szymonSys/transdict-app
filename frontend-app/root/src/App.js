@@ -18,7 +18,7 @@ import PrivateContent from "./containers/PrivateContent";
 import useAuthentication from "./shared/hooks/useAutentication";
 
 function App() {
-  const isAuthenticating = useAuthentication();
+  const [isAuthenticating] = useAuthentication();
 
   return (
     <div className="App">

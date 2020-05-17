@@ -17,10 +17,10 @@ import {
 
 import { createMessage, MESSAGE_TYPES } from "../actions/messages";
 
-export const authenticate = () => (dispatch, getState) => {
-  dispatch({ type: USER_AUTHENTICATING });
+export const authenticate = () => async (dispatch, getState) => {
+  await dispatch({ type: USER_AUTHENTICATING });
 
-  authenticateRequest(getState().auth.token)
+  await authenticateRequest(getState().auth.token)
     .then((userData) => {
       if (userData.isAuthenticated) {
         dispatch({ type: USER_AUTHENTICATED, payload: userData.email });
@@ -38,10 +38,15 @@ export const authenticate = () => (dispatch, getState) => {
       console.error(err);
       dispatch({ type: AUTH_ERROR });
     });
+
+  return getState().auth;
 };
 
-export const login = (email = null, password = null) => (dispatch) => {
-  loginRequest(email, password)
+export const login = (email = null, password = null) => async (
+  dispatch,
+  getState
+) => {
+  await loginRequest(email, password)
     .then((data) => {
       if (data.isLoggedIn && data.token) {
         dispatch({
@@ -63,10 +68,14 @@ export const login = (email = null, password = null) => (dispatch) => {
         createMessage(MESSAGE_TYPES.fail, "loginMsg", "Logging in failed!")
       );
     });
+  return getState().auth;
 };
 
-export const register = (email = null, password = null) => (dispatch) => {
-  registerRequest(email, password)
+export const register = (email = null, password = null) => async (
+  dispatch,
+  getState
+) => {
+  await registerRequest(email, password)
     .then((data) => {
       if (!data.isSignedUp) return;
       if (data.isLoggedIn) {
@@ -88,10 +97,11 @@ export const register = (email = null, password = null) => (dispatch) => {
       console.error(err);
       dispatch({ type: REGISTER_FAIL });
     });
+  return getState().auth;
 };
 
-export const logout = () => (dispatch, getState) => {
-  logoutRequest(getState().auth.token)
+export const logout = () => async (dispatch, getState) => {
+  await logoutRequest(getState().auth.token)
     .then((data) => {
       if (!data.isLoggedIn) {
         dispatch({ type: LOGOUT_SUCCESS });
@@ -101,4 +111,5 @@ export const logout = () => (dispatch, getState) => {
     .catch((err) => {
       console.error(err);
     });
+  return getState().auth;
 };
