@@ -15,7 +15,7 @@ import AppBar from "./Views/AppBar";
 import NavigationView from "./Views/NavigationView";
 import LoadingView from "./shared/components/LoadingView";
 import PrivateContent from "./containers/PrivateContent";
-import { useAuthentication } from "./shared/hooks";
+import useAuthentication from "./shared/hooks/useAutentication";
 
 function App() {
   const isAuthenticating = useAuthentication();
