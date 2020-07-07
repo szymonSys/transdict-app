@@ -93,7 +93,7 @@ export function deleteCollection(token = null, { collectionId = null } = {}) {
 export function getUserCollections(
   token = null,
   {
-    limit = 10,
+    limit = 20,
     offset = 0,
     sortBy = BY_DEFAULT,
     sortDirection = DEFAULT_ORDER,

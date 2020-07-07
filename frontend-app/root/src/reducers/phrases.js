@@ -16,17 +16,19 @@ const initialState = {
 };
 
 export default function (state = { ...initialState }, action) {
-  switch (action.type) {
+  const { type, payload } = action;
+
+  switch (type) {
     case TRANSLATE:
-      return { ...state, ...action.payload };
+      return { ...state, ...payload };
     case SET_FROM:
-      return { ...state, from: action.payload };
+      return { ...state, from: payload };
     case SET_TO:
-      return { ...state, to: action.payload };
+      return { ...state, to: payload };
     case SET_PHRASE:
-      return { ...state, phrase: action.payload };
+      return { ...state, phrase: payload };
     case SET_ALL:
-      return { ...action.payload };
+      return { ...payload };
     case RESET:
       return { ...initialState };
     default:

@@ -12,3 +12,22 @@ export const BY_DEFAULT = CREATED_AT;
 export const ASC_ORDER = "ASC";
 export const DESC_ORDER = "DESC";
 export const DEFAULT_ORDER = ASC_ORDER;
+export const DEFAULT_LIMIT = 20;
+
+export const SORT_OPTIONS = Object.freeze({
+  SORT_BY_NAME: "name",
+  SORT_BY_TRANSLATIONS: "translationsQuantity",
+  SORT_BY_LEARNED: "learnedQuantity",
+  SORT_BY_CREATED_AT: "createdAt",
+  SORT_BY_UPDATED_AT: "updatedAt",
+  SORT_BY_ID: "id",
+  SORT_DEFAULT: "id",
+});
+
+// export const SORT_BY_NAME = "name";
+// export const SORT_BY_TRANSLATIONS = "translationsQuantity";
+// export const SORT_BY_LEARNED = "learnedQuantity";
+// export const SORT_BY_CREATED_AT = "createdAt";
+// export const SORT_BY_UPDATED_AT = "updatedAt";
+// export const SORT_BY_ID = "id";
+// export const SORT_DEFAULT = SORT_BY_ID;

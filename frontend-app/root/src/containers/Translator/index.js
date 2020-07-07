@@ -44,7 +44,7 @@ function Translator({ translate, phrase }) {
         {languages[0]} {languages[1]}
       </h2>
       <p>Translator</p>
-      <button onClick={() => translate("cześć", { to: "en" })}>
+      <button onClick={() => translate("cześć", { languageTo: "en" })}>
         translate
       </button>
     </div>

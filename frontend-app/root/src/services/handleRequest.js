@@ -2,7 +2,13 @@ import { checkType, handleFetch } from "../shared/utils";
 
 export default function handleRequest(
   url,
-  { method = "GET", token = null, APIkey = null, requestData = {} } = {}
+  {
+    method = "GET",
+    token = null,
+    APIkey = null,
+    region = null,
+    requestData = {},
+  } = {}
 ) {
   if (!checkType("string", url, method))
     throw new Error("invalid argument in handleRequest function");
@@ -17,6 +23,10 @@ export default function handleRequest(
 
   if (checkType("string", APIkey)) {
     headers["Ocp-Apim-Subscription-Key"] = APIkey;
+  }
+
+  if (checkType("string", region)) {
+    headers["Ocp-Apim-Subscription-Region"] = region;
   }
 
   const requestOptions = {

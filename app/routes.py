@@ -256,7 +256,7 @@ def add_collection(current_user):
   current_user.collections.append(new_collection)
   db.session.commit()
 
-  return jsonify({'isAdded': True})
+  return jsonify({'isAdded': True, 'newCollectionName': new_collection.name})
 
 
 

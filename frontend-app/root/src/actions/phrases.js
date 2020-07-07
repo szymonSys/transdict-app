@@ -12,14 +12,29 @@ import {
   RESET,
 } from "../actions/types";
 
+import store from "../store";
+
 import { createMessage, MESSAGE_TYPES } from "../actions/messages";
+
+const {
+  phrases: { from: languageFrom, to: languageTo },
+} = store.getState();
 
 export const translate = (
   text,
-  { to = null, from = null, toScript = null } = {}
+  { languageTo, languageFrom, toScript = null } = {}
 ) => async (dispatch, getState) => {
-  const response = await translateRequest(text, { from, to, toScript });
+  if (typeof text !== "string" || text === "") return;
+
+  const response = await translateRequest(text, {
+    from: languageFrom,
+    to: languageTo,
+    toScript,
+  });
+
   const [data] = response;
+
+  console.log(data);
 
   let payload = data?.translations;
 
@@ -34,16 +49,21 @@ export const translate = (
   }
 
   if (
-    typeof data?.detetedLanguage?.language !== undefined &&
-    typeof data?.detetedLanguage?.score !== undefined
+    Boolean(data?.detectedLanguage?.language) &&
+    Boolean(data?.detectedLanguage?.score)
   ) {
-    payload.score = data.detectedLanguage.score;
-    payload.from = data.detectedLanguage.language;
+    payload.score = data?.detectedLanguage?.score;
+    payload.from = data?.detectedLanguage?.language;
+  } else {
+    payload.from = languageFrom;
+    payload.score = null;
   }
+
+  const { from, to, text: translation, phrase = text, score } = payload;
 
   await dispatch({
     type: TRANSLATE,
-    payload: { ...payload, translation: payload.text },
+    payload: { from, to, translation, phrase, score },
   });
   return getState().phrases;
 };
