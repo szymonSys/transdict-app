@@ -3,7 +3,8 @@ import {
   CHECK_TRANSLATION,
   ADD_TRANSLATION,
   DELETE_TRANSLATION,
-  BY_DEFAULT,
+  TRANSLATIONS_SORT_OPTIONS,
+  COLLECTIONS_SORT_OPTIONS,
   DEFAULT_ORDER,
 } from "./actionsTypes";
 import {
@@ -19,6 +20,9 @@ import {
   getUserURL,
   getAllTranslationsIdsURL,
 } from "./urls";
+
+const { SORT_DEFAULT: SORT_TRANSLATIONS_DEFAULT } = TRANSLATIONS_SORT_OPTIONS;
+const { SORT_DEFAULT: SORT_COLLECTIONS_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
 export function login(email = null, password = null) {
   return handleRequest(getLoginURL(), {
@@ -95,7 +99,7 @@ export function getUserCollections(
   {
     limit = 20,
     offset = 0,
-    sortBy = BY_DEFAULT,
+    sortBy = SORT_COLLECTIONS_DEFAULT,
     sortDirection = DEFAULT_ORDER,
   } = {}
 ) {
@@ -113,7 +117,7 @@ export function getTranslationsFromCollection(
     collectionId = null,
     limit = 10,
     offset = 0,
-    sortBy = BY_DEFAULT,
+    sortBy = SORT_TRANSLATIONS_DEFAULT,
     sortDirection = DEFAULT_ORDER,
   } = {}
 ) {

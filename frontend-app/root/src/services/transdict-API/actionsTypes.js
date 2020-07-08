@@ -14,10 +14,19 @@ export const DESC_ORDER = "DESC";
 export const DEFAULT_ORDER = ASC_ORDER;
 export const DEFAULT_LIMIT = 20;
 
-export const SORT_OPTIONS = Object.freeze({
+export const COLLECTIONS_SORT_OPTIONS = Object.freeze({
   SORT_BY_NAME: "name",
   SORT_BY_TRANSLATIONS: "translationsQuantity",
   SORT_BY_LEARNED: "learnedQuantity",
+  SORT_BY_CREATED_AT: "createdAt",
+  SORT_BY_UPDATED_AT: "updatedAt",
+  SORT_BY_ID: "id",
+  SORT_DEFAULT: "id",
+});
+
+export const TRANSLATIONS_SORT_OPTIONS = Object.freeze({
+  SORT_BY_PRIMARY_PHRASE: "primaryPhrase",
+  SORT_BY_SECONDARY_PHRASE: "secondaryPhrase",
   SORT_BY_CREATED_AT: "createdAt",
   SORT_BY_UPDATED_AT: "updatedAt",
   SORT_BY_ID: "id",

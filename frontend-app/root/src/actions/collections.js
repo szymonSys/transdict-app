@@ -4,8 +4,6 @@ import {
   getUserCollections as getUserCollectionsRequest,
 } from "../services/transdict-API/requests";
 
-import { checkType } from "../shared/utils";
-
 import {
   UPDATE_COLLECTIONS,
   CLEAR_COLLECTIONS,
@@ -22,7 +20,7 @@ import {
   // SORT_BY_NAME,
   // SORT_BY_TRANSLATIONS,
   // SORT_BY_UPDATED_AT,
-  SORT_OPTIONS,
+  COLLECTIONS_SORT_OPTIONS,
   DEFAULT_ORDER,
   DEFAULT_LIMIT,
   ASC_ORDER,
@@ -31,7 +29,9 @@ import {
 
 import { createMessage, MESSAGE_TYPES } from "./messages";
 
-const { SORT_DEFAULT } = SORT_OPTIONS;
+import { checkType } from "../shared/utils";
+
+const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
 export const getUserCollections = ({
   sortBy = SORT_DEFAULT,

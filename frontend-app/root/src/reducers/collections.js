@@ -1,22 +1,24 @@
 import {
   UPDATE_COLLECTIONS,
   CLEAR_COLLECTIONS,
-  SET_SORT_BY,
-  SET_LIMIT,
-  SET_ORDER,
+  SET_COLLECTIONS_SORT_BY,
+  SET_COLLECTIONS_LIMIT,
+  SET_COLLECTIONS_ORDER,
 } from "../actions/types";
 
 import {
-  BY_DEFAULT,
+  COLLECTIONS_SORT_OPTIONS,
   DEFAULT_ORDER,
   DEFAULT_LIMIT,
 } from "../services/transdict-API/actionsTypes";
 
+const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
+
 const initialState = {
-  sortBy: BY_DEFAULT,
+  collections: [],
+  sortBy: SORT_DEFAULT,
   sortDirection: DEFAULT_ORDER,
   limit: DEFAULT_LIMIT,
-  collections: [],
 };
 
 export default function (state = { ...initialState }, action) {
@@ -27,11 +29,11 @@ export default function (state = { ...initialState }, action) {
       return { ...state, collections: [...state.collections, payload] };
     case CLEAR_COLLECTIONS:
       return { ...state, collections: [] };
-    case SET_SORT_BY:
+    case SET_COLLECTIONS_SORT_BY:
       return { ...state, sortBy: payload };
-    case SET_LIMIT:
+    case SET_COLLECTIONS_LIMIT:
       return { ...state, limit: payload };
-    case SET_ORDER:
+    case SET_COLLECTIONS_ORDER:
       return { ...state, sortDirection: payload };
     default:
       return state;
