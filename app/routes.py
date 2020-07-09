@@ -462,7 +462,7 @@ def getAllTranslationsIdsFromCollection(current_user):
       translationsIds.append(row[0])
 
 
-    return jsonify({'translationsIds': translationsIds, 'isSent': True})
+    return jsonify({'translationsIds': translationsIds, 'isSent': True, 'areLearned': areLearned})
 
 
 

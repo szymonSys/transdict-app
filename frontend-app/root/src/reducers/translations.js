@@ -12,6 +12,8 @@ import {
   SET_TRANSLATIONS_SORT_BY,
   SET_TRANSLATIONS_LIMIT,
   SET_TRANSLATIONS_ORDER,
+  SET_COLLECTION_DATA,
+  TOGGLE_LEARNED,
 } from "../actions/types";
 
 import {
@@ -25,7 +27,17 @@ const { SORT_DEFAULT } = TRANSLATIONS_SORT_OPTIONS;
 const defaultState = {
   ids: [],
   translations: [],
+  collection: {
+    name: null,
+    id: null,
+    translationsQuantity: null,
+    learnedQuantity: null,
+    createdAt: null,
+    updatedAt: null,
+  },
   isFlashcardMode: false,
+  onlyLearned: false,
+  onlyUnlearned: false,
   isDictMode: true,
   sortBy: SORT_DEFAULT,
   sortDirection: DEFAULT_ORDER,
@@ -60,6 +72,10 @@ export default function (state = defaultState, action) {
     case SET_TRANSLATIONS_LIMIT:
       return {};
     case SET_TRANSLATIONS_ORDER:
+      return {};
+    case SET_COLLECTION_DATA:
+      return {};
+    case TOGGLE_LEARNED:
       return {};
     default:
       return state;
