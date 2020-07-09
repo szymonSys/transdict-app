@@ -33,3 +33,19 @@ export const setUrlParams = (params = {}) => {
 
   return urlArgsString;
 };
+
+export const shuffle = (array) =>
+  !Array.isArray(array) || !array.length
+    ? array
+    : array.reduceRight(
+        (shufflingArray, _, index) => {
+          const drawnIndex = Math.floor(Math.random() * (index + 1));
+          const currentShuffled = shufflingArray[index];
+
+          shufflingArray[index] = shufflingArray[drawnIndex];
+          shufflingArray[drawnIndex] = currentShuffled;
+
+          return shufflingArray;
+        },
+        [...array]
+      );

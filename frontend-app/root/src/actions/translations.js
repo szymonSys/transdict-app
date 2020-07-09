@@ -34,19 +34,21 @@ import {
 
 import { createMessage, MESSAGE_TYPES } from "./messages";
 
-import { checkType } from "../shared/utils";
+import { checkType, shuffle } from "../shared/utils";
 
 const { SORT_DEFAULT } = TRANSLATIONS_SORT_OPTIONS;
 
-export const getTranslations = () => async (dispatch, setState) => {};
-export const getTranslationsIds = () => async (dispatch, setState) => {};
-export const getTranslationsByIds = () => async (dispatch, setState) => {};
-export const deleteTranslation = () => async (dispatch, setState) => {};
-export const checkTranslation = () => async (dispatch, setState) => {};
-export const addTranslation = () => async (dispatch, setState) => {};
-export const shuffleTranslationsIds = () => async (dispatch, setState) => {};
-export const clearTranslations = () => async (dispatch, setState) => {};
-export const setSortBy = () => async (dispatch, setState) => {};
-export const setOrder = () => async (dispatch, setState) => {};
-export const setLimit = () => async (dispatch, setState) => {};
-export const toggleMode = () => async (dispatch, setState) => {};
+export const getTranslations = (collectionId) => async (dispatch, getState) => {
+  const response = await getTranslationsByIdsRequest();
+};
+export const getTranslationsIds = () => async (dispatch, getState) => {};
+export const getTranslationsByIds = () => async (dispatch, getState) => {};
+export const deleteTranslation = () => async (dispatch, getState) => {};
+export const checkTranslation = () => async (dispatch, getState) => {};
+export const addTranslation = () => async (dispatch, getState) => {};
+export const shuffleTranslationsIds = () => async (dispatch, getState) => {};
+export const clearTranslations = () => async (dispatch, getState) => {};
+export const setSortBy = () => async (dispatch, getState) => {};
+export const setOrder = () => async (dispatch, getState) => {};
+export const setLimit = () => async (dispatch, getState) => {};
+export const toggleMode = () => async (dispatch, getState) => {};
