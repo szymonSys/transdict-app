@@ -182,7 +182,7 @@ def update_collection(current_user):
     db.session.add(new_translation_status)
     db.session.commit()
 
-    return jsonify({'isUpdated': True})
+    return jsonify({'isUpdated': True, 'newTranslation': {'id': translation.id, 'primaryPhrase': translation.primaryPhrase, 'secondaryPhrase': translation.secondaryPhrase, 'primaryLanguage': translation.primaryLanguage, 'secondaryLanguage': translation.secondaryLanguage, 'updatedAt': translation.updatedAt, 'createdAt': translation.createdAt, 'collectionId': new_translation_status.collectionId, 'isLearned': new_translation_status.isLearned }})
 
   elif request_action == 'delete':
     if request.args.get('translationId') == None:
@@ -205,10 +205,12 @@ def update_collection(current_user):
     if translation_status:
       db.session.delete(translation_status) 
 
+    translationId = target_translation.id
+
     target_collection.translations.remove(target_translation)
     db.session.commit()
 
-    return jsonify({'isUpdated': True})
+    return jsonify({'isUpdated': True, 'id': translationId})
 
   elif request_action == 'check':
  
@@ -222,7 +224,7 @@ def update_collection(current_user):
     translation_status.updatedAt = datetime.datetime.now()
     db.session.commit()
 
-    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': True})
+    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': True, 'id': translation_status.id})
 
   else:
 

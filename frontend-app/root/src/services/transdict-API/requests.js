@@ -48,9 +48,8 @@ export function authenticate(token = null) {
 
 export function updateCollection(
   token = null,
-  { action = null, collectionId = null } = {},
+  { action = null, collectionId = null, translationId = null } = {},
   {
-    translationId = null,
     primaryPhrase = null,
     secondaryPhrase = null,
     primaryLanguage = null,

@@ -15,13 +15,13 @@ import {
   GET_TRANSLATIONS_IDS,
   SHUFFLE_TRANSLATIONS_IDS,
   CLEAR_TRANSLATIONS_IDS,
-  SET_FLASHCARD_MODE,
-  SET_DICT_MODE,
+  TOGGLE_MODE,
   SET_TRANSLATIONS_SORT_BY,
   SET_TRANSLATIONS_LIMIT,
   SET_TRANSLATIONS_ORDER,
   SET_COLLECTION_DATA,
   TOGGLE_LEARNED,
+  RESET_TRANSLATIONS_STORE
 } from "../actions/types";
 
 import {
@@ -158,21 +158,67 @@ export const shuffleTranslationsIds = () => async (dispatch, getState) => {
   return getState().translations.ids;
 };
 
-export const deleteTranslation = () => async (dispatch, getState) => {};
+export const deleteTranslation = ({translationId=null, collectionId=null}={}) => async (dispatch, getState) => handleTranslationUpdate(getState, dispatch, translationId, collectionId, DELETE);
 
-export const checkTranslation = () => async (dispatch, getState) => {};
+export const checkTranslation = ({translationId=null, collectionId=null}={}) => async (dispatch, getState) => handleTranslationUpdate(getState, dispatch, translationId, collectionId);
 
-export const addTranslation = () => async (dispatch, getState) => {};
+export const addTranslation = ({collectionId=null}={}, {
+  primaryPhrase = null,
+  secondaryPhrase = null,
+  primaryLanguage = null,
+  secondaryLanguage = null,
+} = {}) => async (dispatch, getState) => {
 
-export const clearTranslations = () => async (dispatch, getState) => {};
+  if(!(checkType('number', collectionId) && checkType('string', primaryPhrase, secondaryPhrase, primaryLanguage, secondaryLanguage))){
+    throw new Error('Collection id has to be type of number, all new translation parameters have to be type of string');
+  }
 
-export const setSortBy = () => async (dispatch, getState) => {};
+  const {auth:{token}} = getState();
 
-export const setOrder = () => async (dispatch, getState) => {};
+  try{
+    const response = await updateCollectionRequest(token, {collectionId}, {primaryPhrase, secondaryPhrase, primaryLanguage, secondaryLanguage});
 
-export const setLimit = () => async (dispatch, getState) => {};
+    const {isUpdated, newTranslation} = response;
+  
+    if(!(isUpdate && checkType('object', newTranslation))){
+      throw new Error('Translation has not been added');
+    }
+  
+    if(Object.values(newTranslation).some(value=>value === undefined || value === null)){
+      throw new Error('Invalid type of responded new translation value');
+    }
+  
+    await dispatch({type: ADD_TRANSLATION, payload: newTranslation});
 
-export const toggleMode = () => async (dispatch, getState) => {};
+    return getState().translations.translations;
+
+  }catch(err){
+    console.error(err)
+  }
+};
+
+export const clearTranslations = () => async (dispatch) => dispatch({type: CLEAR_TRANSLATIONS});
+
+export const clearTranslationsIds = () => async (dispatch) => dispatch({type: CLEAR_TRANSLATIONS_IDS});
+
+export const resetTranslationsStore = () => async (dispatch) => dispatch({type: RESET_TRANSLATIONS_STORE});
+
+export const setSortBy = (sortBy) => async (dispatch, getState) => {
+  if(Object.values(TRANSLATIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
+    throw new Error(`There is no sort option just like ${sortBy}`);
+  }
+
+  await dispatch({
+    type: SET_TRANSLATIONS_SORT_BY,
+    payload: sortBy,
+  });
+};
+
+export const setOrder = (order) => async (dispatch) => dispatch({type: SET_TRANSLATIONS_ORDER, payload: order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER});
+
+export const setLimit = (limit) => async (dispatch) => dispatch({type: SET_TRANSLATIONS_LIMIT, payload: limit});
+
+export const toggleMode = () => async (dispatch) => dispatch({type: TOGGLE_MODE});
 
 export const setCollection = ({name, id, createdAt, updatedAt, translationsQuantity, learnedQuantity}={}) => async (dispatch, getState) => {
 
@@ -202,5 +248,38 @@ export const setLearned = ({all=true, onlyLearned=false}={}) => async (dispatch)
 
 };
 
-
 const setLearnedHelper = (all, onlyLearned) => all ? {onlyLearned: false, onlyUnlearned: false} : { onlyLearned, onlyUnlearned: !onlyLearned };
+
+
+const handleTranslationUpdate = (getState, dispatch, translationId, collectionId, action=CHECK) => {
+  if(!checkType('number', translationId, collectionId)) {
+    throw new Error('Translation and collection has to be type of number');
+  };
+
+  if(action !== CHECK || action !== DELETE){
+    throw new Error('Invalid action type');
+  }
+
+  const {auth:{token}, translations:{translations, collection:{id: cId}}} = getState();
+
+  try{
+    const response = await updateCollectionRequest(token, {action, collectionId, translationId});
+
+    if(!(checkType('object', response) && response.isUpdated)) {
+      throw new Error(`Translation have not been ${action}ed`);
+    };
+  
+    const {isUpdated, id} = response;
+  
+    // const translationsWithoutDeleted = translations.map(item=>item.id !== id);
+  
+    await dispatch({type: action === DELETE ? DELETE_TRANSLATION : CHECK_TRANSLATION, payload: {id}});
+
+    return getState().translations.translations;
+
+  }catch(err){
+    console.error(err)
+
+    return;
+  }
+}

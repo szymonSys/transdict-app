@@ -7,13 +7,13 @@ import {
   GET_TRANSLATIONS_IDS,
   SHUFFLE_TRANSLATIONS_IDS,
   CLEAR_TRANSLATIONS_IDS,
-  SET_FLASHCARD_MODE,
-  SET_DICT_MODE,
   SET_TRANSLATIONS_SORT_BY,
   SET_TRANSLATIONS_LIMIT,
   SET_TRANSLATIONS_ORDER,
   SET_COLLECTION_DATA,
   TOGGLE_LEARNED,
+  RESET_TRANSLATIONS_STORE,
+  TOGGLE_MODE,
 } from "../actions/types";
 
 import {
@@ -63,10 +63,6 @@ export default function (state = defaultState, action) {
       return {};
     case CLEAR_TRANSLATIONS_IDS:
       return {};
-    case SET_FLASHCARD_MODE:
-      return {};
-    case SET_DICT_MODE:
-      return {};
     case SET_TRANSLATIONS_SORT_BY:
       return {};
     case SET_TRANSLATIONS_LIMIT:
@@ -76,6 +72,10 @@ export default function (state = defaultState, action) {
     case SET_COLLECTION_DATA:
       return {};
     case TOGGLE_LEARNED:
+      return {};
+    case RESET_TRANSLATIONS_STORE:
+      return {};
+    case TOGGLE_MODE:
       return {};
     default:
       return state;

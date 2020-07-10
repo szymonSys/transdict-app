@@ -9,7 +9,8 @@ import {
   CLEAR_COLLECTIONS,
   SET_ORDER,
   SET_LIMIT,
-  SET_SORT_BY,
+  SET_COLLECTIONS_SORT_BY,
+  SET_COLLECTIONS_LIMIT,
 } from "./types";
 
 import {
@@ -140,7 +141,7 @@ export const deleteCollection = (collectionId) => async (
 
 const setOrder = (order) => async (dispatch) => {
   await dispatch({
-    type: SET_ORDER,
+    type: SET_COLLECTIONS_ORDER,
     payload:
       order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER,
   });
@@ -148,19 +149,19 @@ const setOrder = (order) => async (dispatch) => {
 
 const setLimit = (limit) => async (dispatch) => {
   await dispatch({
-    type: SET_LIMIT,
+    type: SET_COLLECTIONS_LIMIT,
     payload: limit,
   });
 };
 
-const setSortBy = (order) => async (dispatch) => {
-  if (Object.values(SORT_OPTIONS).indexOf(order) === -1) {
-    throw new Error(`There is no sort option just like ${order}`);
+const setSortBy = (sortBy) => async (dispatch) => {
+  if (Object.values(COLLECTIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
+    throw new Error(`There is no sort option just like ${sortBy}`);
   }
 
   await dispatch({
-    type: SET_SORT_BY,
-    payload: order,
+    type: SET_COLLECTIONS_SORT_BY,
+    payload: sortBy,
   });
 };
 

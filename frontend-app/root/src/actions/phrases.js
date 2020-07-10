@@ -34,8 +34,6 @@ export const translate = (
 
   const [data] = response;
 
-  console.log(data);
-
   let payload = data?.translations;
 
   if (
@@ -43,7 +41,7 @@ export const translate = (
     !Array.isArray(payload) ||
     !payload.length
   ) {
-    return;
+    throw new Error("Translation of the phrase has been failed");
   } else {
     payload = payload[0];
   }
