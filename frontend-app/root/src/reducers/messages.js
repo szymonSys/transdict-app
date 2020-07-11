@@ -1,19 +1,30 @@
-import { CREATE_MESSAGE, RESET_STATE } from "../actions/types";
+import {
+  CREATE_MESSAGE,
+  RESET_MESSAGES,
+  RESET_ERRORS,
+  DELETE_MESSAGE,
+} from "../actions/types";
 
 const initialState = {};
 
 export default function (state = initialState, action) {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case CREATE_MESSAGE:
+      const { msgName, msgText: text, msgType: type } = payload;
       return {
         ...state,
-        [action.payload.msgName]: {
-          text: action.payload.msgText,
-          type: action.payload.msgType,
+        [msgName]: {
+          text,
+          type,
         },
       };
-    case RESET_STATE:
-      return (state = initialState);
+    case DELETE_MESSAGE:
+      const newState = { ...state };
+      delete newState[payload];
+      return newState;
+    case RESET_MESSAGES:
+      return initialState;
     default:
       return state;
   }

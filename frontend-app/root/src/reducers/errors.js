@@ -1,4 +1,4 @@
-import { GET_ERRORS, RESET_STATE } from "../actions/types";
+import { GET_ERRORS, RESET_ERRORS } from "../actions/types";
 
 const initialState = {
   message: null,
@@ -6,13 +6,14 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
-  switch (action.type) {
+  const { type, payload } = action;
+  switch (type) {
     case GET_ERRORS:
       return {
-        message: action?.payload?.message,
-        status: action?.payload?.status,
+        message: payload?.message,
+        status: payload?.status,
       };
-    case RESET_STATE:
+    case RESET_ERRORS:
       return (state = initialState);
     default:
       return state;
