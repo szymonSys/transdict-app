@@ -372,6 +372,9 @@ def get_translations_with_limit_and_offset(current_user):
 
     translations = db.session.query(Translation, TranslationStatus).outerjoin(TranslationStatus, Translation.id == TranslationStatus.translationId).filter(db.and_(TranslationStatus.collectionId==collection.id)).order_by(set_direction(sort_direction)(order_by)).limit(limit).offset(offset).all()
 
+    translationsQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id).count())
+
+    learnedQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True).count())
 
     translations_response = []
 
@@ -388,7 +391,7 @@ def get_translations_with_limit_and_offset(current_user):
 
       translations_response.append(trans)
     
-    return jsonify({'collectionName': collection.name, 'collectionId': collection.id, 'createdAt': collection.createdAt, 'updatedAt': collection.updatedAt, 'translations': translations_response, 'contentIsSent': True})
+    return jsonify({'collectionName': collection.name, 'collectionId': collection.id, 'createdAt': collection.createdAt, 'updatedAt': collection.updatedAt, 'translationsQuantity': translationsQuantity, 'learnedQuantity': learnedQuantity, 'translations': translations_response, 'contentIsSent': True})
 
 
 

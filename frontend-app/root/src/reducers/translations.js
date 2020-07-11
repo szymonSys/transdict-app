@@ -48,35 +48,52 @@ export default function (state = defaultState, action) {
   const { type, payload } = action;
   switch (type) {
     case UPDATE_TRANSLATIONS:
-      return {};
+      return { ...state, translations: [...state.translations, ...payload] };
     case ADD_TRANSLATION:
-      return {};
+      return {
+        ...state,
+        translations: [...state.translations, { ...payload }],
+      };
     case DELETE_TRANSLATION:
-      return {};
+      const translationsWithoutDeleted = state.translations.filter(
+        (translation) => translation.id !== payload.id
+      );
+      return { ...state, translations: translationsWithoutDeleted };
     case CHECK_TRANSLATION:
-      return {};
+      const translations = state.translations.map((translation) =>
+        translation.id === payload.id
+          ? { ...translation, isLearned: !translation.isLearned }
+          : translation
+      );
+      return { ...state, translations };
     case CLEAR_TRANSLATIONS:
-      return {};
+      return { ...state, translations: [] };
     case GET_TRANSLATIONS_IDS:
-      return {};
+      return { ...state, ids: [...payload] };
     case SHUFFLE_TRANSLATIONS_IDS:
-      return {};
+      return { ...state, ids: [...payload] };
     case CLEAR_TRANSLATIONS_IDS:
-      return {};
+      return { ...state, ids: [] };
     case SET_TRANSLATIONS_SORT_BY:
-      return {};
+      return { ...state, sortBy: payload };
     case SET_TRANSLATIONS_LIMIT:
-      return {};
+      return { ...state, limit: payload };
     case SET_TRANSLATIONS_ORDER:
-      return {};
+      return { ...state, order: payload };
     case SET_COLLECTION_DATA:
-      return {};
+      return { ...state, collection: { ...payload } };
     case TOGGLE_LEARNED:
-      return {};
-    case RESET_TRANSLATIONS_STORE:
-      return {};
+      const { onlyLearned, onlyUnlearned } = payload;
+      return { ...state, onlyLearned, onlyUnlearned };
     case TOGGLE_MODE:
-      return {};
+      const { isFlashcardMode, isDictMode } = state;
+      return {
+        ...state,
+        isDictMode: !isDictMode,
+        isFlashcardMode: !isFlashcardMode,
+      };
+    case RESET_TRANSLATIONS_STORE:
+      return defaultState;
     default:
       return state;
   }

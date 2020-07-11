@@ -46,6 +46,7 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
     auth: { token },
     translations: {
       translations: currentTranslations,
+      collection,
       limit,
       sortDirection,
       sortBy,
@@ -58,7 +59,7 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
   }
 
   try{
-    const response = await getTranslationsByIdsRequest(token, {
+    const response = await getTranslationsFromCollectionRequest(token, {
       collectionId,
       limit,
       offset = currentTranslations.length,
@@ -66,13 +67,18 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
       sortDirection
     });
 
-    const {collectionName, collectionId: cId, createdAt, updatedAt, translations, contentIsSent} = response;
+    const {collectionName, collectionId: cId, createdAt, updatedAt,learnedQuantity, translationsQuantity, translations, contentIsSent} = response;
 
     if(!contentIsSent) {
       throw new Error('Translations have not been sent.');
     }
 
-    await dispatch({type: SET_COLLECTION_DATA, payload: {createdAt, updatedAt, name: collectionName, id: cId}});
+    const collectionResponseData = {name: collectionName, id: cId, createdAt, updatedAt, learnedQuantity, translationsQuantity}
+
+    if(checkType('object', collection) && Object.entries(collection).some(entry=>entry[1]!==collectionResponseData[entry[0]])){
+
+      await dispatch({type: SET_COLLECTION_DATA, payload: collectionResponseData});
+    }
 
     await dispatch({type: UPDATE_TRANSLATIONS, payload: Array.isArray(translations) ? [...translations] : []});
 
@@ -87,7 +93,7 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
 
 export const getTranslationsIds = (collectionId, {all=true, onlyLearned = false}={}) => async (dispatch, getState) =>{
 
-  const {auth: {token}, translations: {isFlashcardMode}} = getState();
+  const {auth: {token}, translations: {isFlashcardMode, onlyLearned: currentOnlyLearned, onlyUnlearned: currentOnlyUnlearned}} = getState();
 
   if(!isFlashcardMode) {
     throw new Error('App has to be in Flashcard Mode to get all translations ids');
@@ -99,13 +105,15 @@ export const getTranslationsIds = (collectionId, {all=true, onlyLearned = false}
 
     const response = await getAllTranslationsIdsRequest(token, {collectionId, areLearned});
 
-    const { translationsIds: ids, areLearned: areLearnedFromResonse, isSent } = response;
+    const { translationsIds: ids, areLearned: areLearnedFromResponse, isSent } = response;
 
     if(!isSent){
       throw new Error('Translations ids have not been sent');
     }
 
-    await dispatch({type: TOGGLE_LEARNED, payload: setLearnedHelper(all, onlyLearned) });
+    if(areLearnedFromResponse !== currentOnlyLearned){
+      await dispatch({type: TOGGLE_LEARNED, payload: setLearnedHelper(all, areLearnedFromResponse) });
+    }
 
     await dispatch({type: GET_TRANSLATIONS_IDS, payload: Array.isArray(ids) ? ids : []});
 
@@ -139,7 +147,7 @@ export const getTranslationsByIds = (collectionId, quantity=5) => async (dispatc
       throw new Error('Translations have not been sent');
     }
 
-    await dispatch({type: UPDATE_TRANSLATIONS, payload: translations});
+    await dispatch({type: UPDATE_TRANSLATIONS, payload: Array.isArray(translations) ? [...translations] : []});
 
     return getState().translations.translations;
     
@@ -204,6 +212,9 @@ export const clearTranslationsIds = () => async (dispatch) => dispatch({type: CL
 export const resetTranslationsStore = () => async (dispatch) => dispatch({type: RESET_TRANSLATIONS_STORE});
 
 export const setSortBy = (sortBy) => async (dispatch, getState) => {
+
+  if(getState().translations.sortBy === sortBy) return;
+
   if(Object.values(TRANSLATIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
     throw new Error(`There is no sort option just like ${sortBy}`);
   }
@@ -214,9 +225,9 @@ export const setSortBy = (sortBy) => async (dispatch, getState) => {
   });
 };
 
-export const setOrder = (order) => async (dispatch) => dispatch({type: SET_TRANSLATIONS_ORDER, payload: order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER});
+export const setOrder = (order) => async (dispatch, getState) => getState().translations.order === order ? undefined : dispatch({type: SET_TRANSLATIONS_ORDER, payload: order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER});
 
-export const setLimit = (limit) => async (dispatch) => dispatch({type: SET_TRANSLATIONS_LIMIT, payload: limit});
+export const setLimit = (limit) => async (dispatch, getState) => getState().translations.limit === limit ? undefined : dispatch({type: SET_TRANSLATIONS_LIMIT, payload: limit});
 
 export const toggleMode = () => async (dispatch) => dispatch({type: TOGGLE_MODE});
 
@@ -271,9 +282,7 @@ const handleTranslationUpdate = (getState, dispatch, translationId, collectionId
   
     const {isUpdated, id} = response;
   
-    // const translationsWithoutDeleted = translations.map(item=>item.id !== id);
-  
-    await dispatch({type: action === DELETE ? DELETE_TRANSLATION : CHECK_TRANSLATION, payload: {id}});
+    await dispatch({type: action === DELETE ? DELETE_TRANSLATION : CHECK_TRANSLATION, payload: {id} });
 
     return getState().translations.translations;
 
