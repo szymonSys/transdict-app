@@ -4,7 +4,7 @@ import {
   SET_TO,
   SET_PHRASE,
   SET_ALL,
-  RESET,
+  RESET_PHRASES,
 } from "../actions/types";
 
 const initialState = {
@@ -29,7 +29,7 @@ export default function (state = { ...initialState }, action) {
       return { ...state, phrase: payload };
     case SET_ALL:
       return { ...payload };
-    case RESET:
+    case RESET_PHRASES:
       return { ...initialState };
     default:
       return state;

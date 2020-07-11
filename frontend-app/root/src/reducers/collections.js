@@ -1,6 +1,7 @@
 import {
   UPDATE_COLLECTIONS,
   CLEAR_COLLECTIONS,
+  RESET_COLLECTIONS_STORE,
   SET_COLLECTIONS_SORT_BY,
   SET_COLLECTIONS_LIMIT,
   SET_COLLECTIONS_ORDER,
@@ -35,6 +36,8 @@ export default function (state = { ...initialState }, action) {
       return { ...state, limit: payload };
     case SET_COLLECTIONS_ORDER:
       return { ...state, sortDirection: payload };
+    case RESET_COLLECTIONS_STORE:
+      return { ...initialState };
     default:
       return state;
   }

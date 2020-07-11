@@ -7,20 +7,12 @@ import {
 import {
   UPDATE_COLLECTIONS,
   CLEAR_COLLECTIONS,
-  SET_ORDER,
-  SET_LIMIT,
+  RESET_COLLECTIONS_STORE,
   SET_COLLECTIONS_SORT_BY,
   SET_COLLECTIONS_LIMIT,
 } from "./types";
 
 import {
-  // SORT_DEFAULT,
-  // SORT_BY_CREATED_AT,
-  // SORT_BY_ID,
-  // SORT_BY_LEARNED,
-  // SORT_BY_NAME,
-  // SORT_BY_TRANSLATIONS,
-  // SORT_BY_UPDATED_AT,
   COLLECTIONS_SORT_OPTIONS,
   DEFAULT_ORDER,
   DEFAULT_LIMIT,
@@ -41,23 +33,6 @@ export const getUserCollections = ({
 } = {}) => async (dispatch, getState) => {
   const token = getState().auth.token;
 
-  //   const response = await getUserCollectionsRequest(getState().auth.token, {
-  //     limit,
-  //     offset = Array.isArray(getState().collections) ? getState().collections.length : 0,
-  //     sortBy,
-  //     sortDirection,
-  //   });
-
-  //   if (!Boolean(response?.contentIsSent)) {
-  //     throw new Error("Collections have not been sent!");
-  //   }
-
-  //   const collections = response?.collections ? response.collections : [];
-
-  //   await dispatch({ type: GET_COLLECTIONS, payload: collections });
-
-  //   return getState().collections;
-
   return handleGetCollections(token, dispatch, {
     offset: (offset = Array.isArray(getState().collections)
       ? getState().collections.length
@@ -75,44 +50,44 @@ export const addCollection = (collectionName) => async (dispatch, getState) => {
 
   const token = getState().auth.token;
 
-  const response = await addCollectionRequest(token, dispatch, {
-    collectionName,
-  });
-
-  if (!Boolean(response?.isAdded)) {
-    throw new Error("Collection has not been added!");
-  } else {
-    return handleGetCollections(token, {
-      offset: 0,
-      limit: Array.isArray(getState().collections)
-        ? getState().collections.length
-        : DEFAULT_LIMIT,
-      sortBy: SORT_DEFAULT,
-      sortDirection: DEFAULT_ORDER,
+  try {
+    const response = await addCollectionRequest(token, dispatch, {
+      collectionName,
     });
+
+    const { isAdded, newCollectionName } = response;
+
+    if (!Boolean(isAdded)) {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.fail,
+          "collectionAddMsg",
+          `Collection has not been added`
+        )
+      );
+
+      throw new Error("Collection has not been added!");
+    } else {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.success,
+          "collectionAddMsg",
+          `Collection ${newCollectionName} has been added`
+        )
+      );
+
+      return handleGetCollections(token, {
+        offset: 0,
+        limit: Array.isArray(getState().collections)
+          ? getState().collections.length
+          : DEFAULT_LIMIT,
+        sortBy: SORT_DEFAULT,
+        sortDirection: DEFAULT_ORDER,
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
-
-  // try{
-  //   const response = await getUserCollectionsRequest(getState().auth.token, {
-  //     offset: 0,
-  //     limit: Array.isArray(getState().collections) ? getState().collections.length : DEFAULT_LIMIT,
-  //     sortBy: BY_DEFAULT,
-  //     sortDirection: DEFAULT_ORDER
-  //   });
-
-  //   if (!Boolean(response?.contentIsSent)) {
-  //     throw new Error("Collections have not been sent!");
-  //   }
-
-  //   const collections = response?.collections ? response.collections : [];
-
-  //   await dispatch({ type: GET_COLLECTIONS, payload: collections });
-
-  //   return getState().collections;
-
-  // } catch(err){
-  //   console.error(err)
-  // }
 };
 
 export const deleteCollection = (collectionId) => async (
@@ -121,40 +96,76 @@ export const deleteCollection = (collectionId) => async (
 ) => {
   const token = getState().auth.token;
 
-  const response = await deleteCollectionRequest(token, {
-    collectionId,
-  });
-
-  if (!Boolean(response?.isDeleted)) {
-    throw new Error("Collection has not been deleted!");
-  } else {
-    return handleGetCollections(token, dispatch, {
-      offset: 0,
-      limit: Array.isArray(getState().collections)
-        ? getState().collections.length
-        : DEFAULT_LIMIT,
-      sortBy: SORT_DEFAULT,
-      sortDirection: DEFAULT_ORDER,
+  try {
+    const response = await deleteCollectionRequest(token, {
+      collectionId,
     });
+
+    const { isDeleted, deletedCollectionName } = response;
+
+    if (!Boolean(isDeleted)) {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.fail,
+          "collectionDeleteMsg",
+          `Collection has not been deleted`
+        )
+      );
+
+      throw new Error("Collection has not been deleted!");
+    } else {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.success,
+          "collectionDeleteMsg",
+          `Collection ${deletedCollectionName} has been deleted`
+        )
+      );
+
+      return handleGetCollections(token, dispatch, {
+        offset: 0,
+        limit: Array.isArray(getState().collections)
+          ? getState().collections.length
+          : DEFAULT_LIMIT,
+        sortBy: SORT_DEFAULT,
+        sortDirection: DEFAULT_ORDER,
+      });
+    }
+  } catch (err) {
+    console.error(err);
   }
 };
 
-const setOrder = (order) => async (dispatch) => {
+export const setOrder = (order) => async (dispatch) => {
   await dispatch({
     type: SET_COLLECTIONS_ORDER,
     payload:
       order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER,
   });
+  dispatch(
+    createMessage(
+      MESSAGE_TYPES.info,
+      "collectionsOrderMsg",
+      `Fetching collections order is ${order}`
+    )
+  );
 };
 
-const setLimit = (limit) => async (dispatch) => {
+export const setLimit = (limit) => async (dispatch) => {
   await dispatch({
     type: SET_COLLECTIONS_LIMIT,
     payload: limit,
   });
+  dispatch(
+    createMessage(
+      MESSAGE_TYPES.info,
+      "collectionsLimitMsg",
+      `Fetching collections limit is ${limit}`
+    )
+  );
 };
 
-const setSortBy = (sortBy) => async (dispatch) => {
+export const setSortBy = (sortBy) => async (dispatch) => {
   if (Object.values(COLLECTIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
     throw new Error(`There is no sort option just like ${sortBy}`);
   }
@@ -163,7 +174,18 @@ const setSortBy = (sortBy) => async (dispatch) => {
     type: SET_COLLECTIONS_SORT_BY,
     payload: sortBy,
   });
+
+  dispatch(
+    createMessage(
+      MESSAGE_TYPES.info,
+      "collectionsSortMsg",
+      `Sort collections by ${sortBy}`
+    )
+  );
 };
+
+export const resetCollectionsStore = () => (dispatch) =>
+  dispatch({ type: RESET_COLLECTIONS_STORE });
 
 async function handleGetCollections(
   token,
@@ -186,12 +208,27 @@ async function handleGetCollections(
     });
 
     if (!Boolean(response?.contentIsSent)) {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.fail,
+          "collectionsUpdateMsg",
+          `Collections have not been updated`
+        )
+      );
       throw new Error("Collections have not been sent!");
     }
 
     const collections = response?.collections ? response.collections : [];
 
     await dispatch({ type: UPDATE_COLLECTIONS, payload: collections });
+
+    dispatch(
+      createMessage(
+        MESSAGE_TYPES.success,
+        "collectionsUpdateMsg",
+        `Collections have been updated`
+      )
+    );
 
     return getState().collections;
   } catch (err) {

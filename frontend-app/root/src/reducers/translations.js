@@ -24,7 +24,7 @@ import {
 
 const { SORT_DEFAULT } = TRANSLATIONS_SORT_OPTIONS;
 
-const defaultState = {
+const initialState = {
   ids: [],
   translations: [],
   collection: {
@@ -44,7 +44,7 @@ const defaultState = {
   limit: DEFAULT_LIMIT,
 };
 
-export default function (state = defaultState, action) {
+export default function (state = initialState, action) {
   const { type, payload } = action;
   switch (type) {
     case UPDATE_TRANSLATIONS:
@@ -93,7 +93,7 @@ export default function (state = defaultState, action) {
         isFlashcardMode: !isFlashcardMode,
       };
     case RESET_TRANSLATIONS_STORE:
-      return defaultState;
+      return { ...initialState };
     default:
       return state;
   }

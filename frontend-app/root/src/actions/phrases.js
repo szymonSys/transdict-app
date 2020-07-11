@@ -9,7 +9,7 @@ import {
   SET_TO,
   SET_PHRASE,
   SET_ALL,
-  RESET,
+  RESET_PHRASES,
 } from "../actions/types";
 
 import store from "../store";
@@ -82,6 +82,6 @@ export const setPhrase = (phrase) => (dispatch, getState) => {
 };
 
 export const resetPhrase = () => (dispatch, getState) => {
-  dispatch({ type: RESET });
+  dispatch({ type: RESET_PHRASES });
   return getState().phrases;
 };
