@@ -1,36 +1,49 @@
 import { getLanguages as getLanguagesRequest } from "../services/text-translate-API/requests";
-import { GET_LANGUAGES } from "../actions/types";
+import { SET_LANGUAGES } from "../actions/types";
 import { createMessage, MESSAGE_TYPES } from "../actions/messages";
-
-async function _getLanguagesObj() {
-  const languagesFromStorage = localStorage.getItem("languages");
-
-  return languagesFromStorage && typeof languagesFromStorage === "object"
-    ? await JSON.parse(languages)
-    : await getLanguagesRequest()?.translation;
-}
 
 export const getLanguages = (translationLanguage = "pl") => async (
   dispatch,
   getState
 ) => {
-  // const response = await getLanguagesRequest();
-  // if (
-  //   !(typeof response === "object" && typeof response?.translation === "object")
-  // )
-  //   return;
-  // const languagesMap = new Map(Object.entries(response.translation));
+  try {
+    const languages = await _getLanguagesObj();
 
-  const languages = await _getLanguagesObj();
+    if (typeof languages !== "object") {
+      dispatch(
+        createMessage(
+          MESSAGE_TYPES.fail,
+          "LanguagesMsg",
+          `Languages have not been sent`
+        )
+      );
 
-  if (typeof languages !== "object") return;
+      throw new Error("Languages have not been sent");
+    }
 
-  const languagesMap = new Map(Object.entries(languages));
+    await dispatch({ type: SET_LANGUAGES, payload: languages });
 
-  await dispatch({ type: GET_LANGUAGES, payload: languagesMap });
+    !localStorage.getItem("languages") &&
+      localStorage.setItem("languages", languages);
 
-  if (!localStorage.getItem("languages"))
-    localStorage.setItem("languages", languages);
+    dispatch(
+      createMessage(
+        MESSAGE_TYPES.success,
+        "LanguagesMsg",
+        `Languages have been set`
+      )
+    );
 
-  return getState().languages;
+    return getState().languages;
+  } catch (err) {
+    console.error(err);
+  }
 };
+
+async function _getLanguagesObj() {
+  const languagesFromStorage = localStorage.getItem("languages");
+
+  return languagesFromStorage
+    ? await JSON.parse(languagesFromStorage)
+    : await getLanguagesRequest()?.translation;
+}

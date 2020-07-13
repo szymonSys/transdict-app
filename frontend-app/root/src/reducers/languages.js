@@ -1,18 +1,20 @@
-import { GET_LANGUAGES } from "../actions/types";
+import { SET_LANGUAGES } from "../actions/types";
 
 const languagesFromStorage = localStorage.getItem("languages");
 
 const initialState = {
-  languages:
-    languagesFromStorage && typeof languagesFromStorage === "object"
-      ? new Map(Object.entries(languagesFromStorage))
-      : null,
+  areLoaded: languagesFromStorage ? true : false,
+  languages: languagesFromStorage
+    ? new Map(Object.entries(languagesFromStorage))
+    : null,
 };
 
 export default function (state = initialState, action) {
-  switch (action.type) {
-    case GET_LANGUAGES:
-      return { ...action.payload };
+  const { type, payload } = action;
+
+  switch (type) {
+    case SET_LANGUAGES:
+      return { languages: new Map(Object.entries(payload)), areLoaded: true };
     default:
       return state;
   }

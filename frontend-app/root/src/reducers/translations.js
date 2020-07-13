@@ -69,7 +69,7 @@ export default function (state = initialState, action) {
     case CLEAR_TRANSLATIONS:
       return { ...state, translations: [] };
     case GET_TRANSLATIONS_IDS:
-      return { ...state, ids: [...payload] };
+      return { ...state, translations: [], ids: [...payload] };
     case SHUFFLE_TRANSLATIONS_IDS:
       return { ...state, ids: [...payload] };
     case CLEAR_TRANSLATIONS_IDS:
@@ -79,7 +79,7 @@ export default function (state = initialState, action) {
     case SET_TRANSLATIONS_LIMIT:
       return { ...state, limit: payload };
     case SET_TRANSLATIONS_ORDER:
-      return { ...state, order: payload };
+      return { ...state, sortDirection: payload };
     case SET_COLLECTION_DATA:
       return { ...state, collection: { ...payload } };
     case TOGGLE_LEARNED:
@@ -91,6 +91,7 @@ export default function (state = initialState, action) {
         ...state,
         isDictMode: !isDictMode,
         isFlashcardMode: !isFlashcardMode,
+        translations: [],
       };
     case RESET_TRANSLATIONS_STORE:
       return { ...initialState };

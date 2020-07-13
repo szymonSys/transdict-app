@@ -182,7 +182,7 @@ def update_collection(current_user):
     db.session.add(new_translation_status)
     db.session.commit()
 
-    return jsonify({'isUpdated': True, 'newTranslation': {'id': translation.id, 'primaryPhrase': translation.primaryPhrase, 'secondaryPhrase': translation.secondaryPhrase, 'primaryLanguage': translation.primaryLanguage, 'secondaryLanguage': translation.secondaryLanguage, 'updatedAt': translation.updatedAt, 'createdAt': translation.createdAt, 'collectionId': new_translation_status.collectionId, 'isLearned': new_translation_status.isLearned }})
+    return jsonify({'isUpdated': True, 'newTranslation': {'id': translation.id, 'primaryPhrase': translation.primaryPhrase, 'secondaryPhrase': translation.secondaryPhrase, 'primaryLanguage': translation.primaryLanguage, 'secondaryLanguage': translation.secondaryLanguage,'createdAt': translation.createdAt, 'collectionId': new_translation_status.collectionId, 'isLearned': new_translation_status.isLearned, 'message': 'Translation has been added!' }})
 
   elif request_action == 'delete':
     if request.args.get('translationId') == None:
@@ -224,7 +224,7 @@ def update_collection(current_user):
     translation_status.updatedAt = datetime.datetime.now()
     db.session.commit()
 
-    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': True, 'id': translation_status.id})
+    return jsonify({'translationIsLearned': translation_status.isLearned, 'isUpdated': True, 'id': translation_status.translationId})
 
   else:
 
@@ -372,9 +372,9 @@ def get_translations_with_limit_and_offset(current_user):
 
     translations = db.session.query(Translation, TranslationStatus).outerjoin(TranslationStatus, Translation.id == TranslationStatus.translationId).filter(db.and_(TranslationStatus.collectionId==collection.id)).order_by(set_direction(sort_direction)(order_by)).limit(limit).offset(offset).all()
 
-    translationsQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id).count())
+    translationsQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id)).count()
 
-    learnedQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True).count())
+    learnedQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True)).count()
 
     translations_response = []
 
@@ -391,7 +391,7 @@ def get_translations_with_limit_and_offset(current_user):
 
       translations_response.append(trans)
     
-    return jsonify({'collectionName': collection.name, 'collectionId': collection.id, 'createdAt': collection.createdAt, 'updatedAt': collection.updatedAt, 'translationsQuantity': translationsQuantity, 'learnedQuantity': learnedQuantity, 'translations': translations_response, 'contentIsSent': True})
+    return jsonify({'translations': translations_response, 'collectionData': {'learnedQuantity' : learnedQuantity, 'translationsQuantity': translationsQuantity, 'id': collection.id, 'name': collection.name, 'updatedAt': collection.updatedAt, 'createdAt': collection.createdAt}, 'isSent': True})
 
 
 
@@ -433,13 +433,13 @@ def get_translations_by_ids(current_user):
       translation['collectionId'] = translation_status.collectionId
       translations_response.append(translation)
 
-    return jsonify({'translations': translations_response, 'contentIsSent': True})
+    return jsonify({'translations': translations_response, 'isSent': True})
 
 
 
 @app.route("/user/collection/translationsIds", methods=['GET'])
 @token_required
-def getAllTranslationsIdsFromCollection(current_user):
+def get_all_translations_ids_from_collection(current_user):
     if not check_session():
       return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
 
@@ -450,7 +450,18 @@ def getAllTranslationsIdsFromCollection(current_user):
 
       return jsonify({'message': 'No data to download', 'contentIsSent': False})
 
+    collection = Collection.query.with_entities(Collection.name, Collection.id, Collection.createdAt, Collection.updatedAt).filter(db.and_(Collection.id==collectionId,Collection.userId==current_user.id)).first()
+
+    if not collection:
+
+      return jsonify({'message': 'Collection is not found!', 'contentIsSent': False})
+
     query_resoult = db.session.query(TranslationStatus.translationId).outerjoin(Collection, Collection.id == TranslationStatus.collectionId).filter(db.and_(TranslationStatus.collectionId == collectionId, Collection.userId == current_user.id))
+
+    translationsQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id)).count()
+
+    learnedQuantity = db.session.query(TranslationStatus).filter(db.and_(TranslationStatus.collectionId==collection.id, TranslationStatus.isLearned==True)).count()
+
 
     if areLearned != None:
       boolIsLearned = False
@@ -466,8 +477,7 @@ def getAllTranslationsIdsFromCollection(current_user):
     for row in query_resoult:
       translationsIds.append(row[0])
 
-
-    return jsonify({'translationsIds': translationsIds, 'isSent': True, 'areLearned': areLearned})
+    return jsonify({'translationsIds': translationsIds, 'isSent': True, 'areLearned': areLearned, 'collectionData': {'learnedQuantity' : learnedQuantity, 'translationsQuantity': translationsQuantity, 'id': collection.id, 'name': collection.name, 'updatedAt': collection.updatedAt, 'createdAt': collection.createdAt}})
 
 
 

@@ -10,6 +10,7 @@ import {
   RESET_COLLECTIONS_STORE,
   SET_COLLECTIONS_SORT_BY,
   SET_COLLECTIONS_LIMIT,
+  SET_COLLECTIONS_ORDER,
 } from "./types";
 
 import {
@@ -33,10 +34,10 @@ export const getUserCollections = ({
 } = {}) => async (dispatch, getState) => {
   const token = getState().auth.token;
 
-  return handleGetCollections(token, dispatch, {
-    offset: (offset = Array.isArray(getState().collections)
+  return handleGetCollections(token, dispatch, getState, {
+    offset: Array.isArray(getState().collections)
       ? getState().collections.length
-      : 0),
+      : 0,
     limit,
     sortBy,
     sortDirection,
@@ -44,13 +45,12 @@ export const getUserCollections = ({
 };
 
 export const addCollection = (collectionName) => async (dispatch, getState) => {
-  if (!checkType("string", collectionName)) {
-    throw new Error("collectionName param has to be string");
-  }
-
-  const token = getState().auth.token;
-
   try {
+    if (!checkType("string", collectionName)) {
+      throw new Error("collectionName param has to be string");
+    }
+
+    const token = getState().auth.token;
     const response = await addCollectionRequest(token, dispatch, {
       collectionName,
     });
@@ -76,7 +76,7 @@ export const addCollection = (collectionName) => async (dispatch, getState) => {
         )
       );
 
-      return handleGetCollections(token, {
+      return handleGetCollections(token, getState, {
         offset: 0,
         limit: Array.isArray(getState().collections)
           ? getState().collections.length
@@ -122,7 +122,7 @@ export const deleteCollection = (collectionId) => async (
         )
       );
 
-      return handleGetCollections(token, dispatch, {
+      return handleGetCollections(token, dispatch, getState, {
         offset: 0,
         limit: Array.isArray(getState().collections)
           ? getState().collections.length
@@ -136,17 +136,20 @@ export const deleteCollection = (collectionId) => async (
   }
 };
 
-export const setOrder = (order) => async (dispatch) => {
+export const toggleOrder = () => async (dispatch, getState) => {
+  const {
+    collections: { sortDirection },
+  } = getState();
+
   await dispatch({
     type: SET_COLLECTIONS_ORDER,
-    payload:
-      order === ASC_ORDER || order === DESC_ORDER ? order : DEFAULT_ORDER,
+    payload: sortDirection === ASC_ORDER ? DESC_ORDER : ASC_ORDER,
   });
   dispatch(
     createMessage(
       MESSAGE_TYPES.info,
       "collectionsOrderMsg",
-      `Fetching collections order is ${order}`
+      `Fetching collections order is ${getState().collections.sortDirection}`
     )
   );
 };
@@ -166,22 +169,26 @@ export const setLimit = (limit) => async (dispatch) => {
 };
 
 export const setSortBy = (sortBy) => async (dispatch) => {
-  if (Object.values(COLLECTIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
-    throw new Error(`There is no sort option just like ${sortBy}`);
+  try {
+    if (Object.values(COLLECTIONS_SORT_OPTIONS).indexOf(sortBy) === -1) {
+      throw new Error(`There is no sort option just like ${sortBy}`);
+    }
+
+    await dispatch({
+      type: SET_COLLECTIONS_SORT_BY,
+      payload: sortBy,
+    });
+
+    dispatch(
+      createMessage(
+        MESSAGE_TYPES.info,
+        "collectionsSortMsg",
+        `Sort collections by ${sortBy}`
+      )
+    );
+  } catch (err) {
+    console.error(err);
   }
-
-  await dispatch({
-    type: SET_COLLECTIONS_SORT_BY,
-    payload: sortBy,
-  });
-
-  dispatch(
-    createMessage(
-      MESSAGE_TYPES.info,
-      "collectionsSortMsg",
-      `Sort collections by ${sortBy}`
-    )
-  );
 };
 
 export const resetCollectionsStore = () => (dispatch) =>
@@ -190,10 +197,9 @@ export const resetCollectionsStore = () => (dispatch) =>
 async function handleGetCollections(
   token,
   dispatch,
+  getState,
   {
-    offset = Array.isArray(getState().collections)
-      ? getState().collections.length
-      : 0,
+    offset = 0,
     limit = DEFAULT_LIMIT,
     sortBy = SORT_DEFAULT,
     sortDirection = DEFAULT_ORDER,
