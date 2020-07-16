@@ -16,7 +16,7 @@ const useInfiniteScroll = (actionCallback, shouldExecute) => {
         entrie.intersectionRatio > 0 && !!shouldExecute && actionCallback();
       });
 
-      if (node) intersectionObserver.current.observe(node);
+      if (node && shouldExecute) intersectionObserver.current.observe(node);
     },
     [shouldExecute]
   );

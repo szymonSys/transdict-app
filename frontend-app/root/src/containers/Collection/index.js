@@ -30,17 +30,19 @@ function Collection({
   setTranslationsSortBy,
   toggleMode,
   setLearned,
-  translations,
+  translations: translationsObject,
   messages,
 }) {
   // TODO: add loading state to reducers, add messages, update sort and order reducers with reset translations
 
   const { name: collectionName, id: collectionId } = useParams();
+  const {
+    translations,
+    collection: { translationsQuantity, learnedQuantity },
+  } = translationsObject;
 
   const checkIfFetchedAddTranslations = () =>
-    !translations.translations.length ||
-    translations.translations.length <
-      translations.collection.translationsQuantity;
+    !translations.length || translations.length < translationsQuantity;
 
   const [shouldExecute, setShouldExecute] = useState(
     checkIfFetchedAddTranslations()
@@ -48,10 +50,7 @@ function Collection({
 
   useEffect(() => {
     setShouldExecute(checkIfFetchedAddTranslations());
-  }, [
-    translations.translations.length,
-    translations.collection.translationsQuantity,
-  ]);
+  }, [translations.length, translationsQuantity]);
 
   return (
     <div>
@@ -62,7 +61,7 @@ function Collection({
       >
         {(ref) => (
           <div>
-            {translations.translations.map((translation) => (
+            {translations.map((translation) => (
               <TranslationItem
                 translation={translation}
                 handleCheck={checkTranslation}
