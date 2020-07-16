@@ -16,12 +16,12 @@ export default function PrivateContent({ auth }) {
     <div>
       <Switch>
         <Route exact path="/collections" component={MyCollectionsView} />
-        <Route exact path="/collections/:name" component={CollectionView} />
+        <Route path="/collections/:name/:id" component={CollectionView} />
         <Route
-          exact
           path="/collections/:name/flashcards/:id"
           component={FlashcardsView}
         />
+        <Redirect to="/" />
       </Switch>
     </div>
   );

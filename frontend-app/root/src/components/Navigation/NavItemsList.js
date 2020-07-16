@@ -4,7 +4,9 @@ import NavItem from "./NavItem";
 export default function NavItemsList({ transitions }) {
   return (
     <ul>
-      <NavItem>Translator</NavItem>
+      <NavItem linkTo="/">Main View</NavItem>
+      <NavItem linkTo="/translator">Translator</NavItem>
+      <NavItem linkTo="/collections">Collections</NavItem>
     </ul>
   );
 }

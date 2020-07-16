@@ -9,10 +9,10 @@ import {
   useParams,
 } from "react-router-dom";
 
-export default function NavItem({ children, path }) {
+export default function NavItem({ children, linkTo }) {
   return (
     <li>
-      <Link>{children}</Link>
+      <Link to={linkTo}>{children}</Link>
     </li>
   );
 }

@@ -46,8 +46,9 @@ import {
 } from "../../actions/collections";
 import { getLanguages } from "../../actions/languages";
 import { connect } from "react-redux";
+import { getTranslationsFromCollection } from "../../services/transdict-API/requests";
 
-function Translator({
+function Tests({
   translate,
   getTranslations,
   getTranslationsIds,
@@ -182,4 +183,4 @@ const mapDispatchToProps = (dispatch) => ({
   setLearned: (options) => dispatch(setLearned(options)),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(Translator);
+export default connect(mapStateToProps, mapDispatchToProps)(Tests);
