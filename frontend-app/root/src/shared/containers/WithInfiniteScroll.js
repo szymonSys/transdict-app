@@ -1,11 +1,10 @@
-import React from "react";
 import useInfiniteScroll from "../../shared/hooks/useInfiniteScroll";
 
 export default function WithInfiniteScroll({
   children,
   callback,
-  shouldExecute,
+  executionOptions,
 }) {
-  const ref = useInfiniteScroll(callback, shouldExecute);
-  return <div>{children(ref)}</div>;
+  const observedRef = useInfiniteScroll(callback, executionOptions);
+  return children(observedRef);
 }

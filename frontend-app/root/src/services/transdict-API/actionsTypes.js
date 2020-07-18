@@ -12,7 +12,7 @@ export const BY_DEFAULT = CREATED_AT;
 export const ASC_ORDER = "ASC";
 export const DESC_ORDER = "DESC";
 export const DEFAULT_ORDER = ASC_ORDER;
-export const DEFAULT_LIMIT = 20;
+export const DEFAULT_LIMIT = 10;
 
 export const COLLECTIONS_SORT_OPTIONS = Object.freeze({
   SORT_BY_NAME: "name",

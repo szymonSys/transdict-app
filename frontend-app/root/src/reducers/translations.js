@@ -58,14 +58,34 @@ export default function (state = initialState, action) {
       const translationsWithoutDeleted = state.translations.filter(
         (translation) => translation.id !== payload.id
       );
-      return { ...state, translations: translationsWithoutDeleted };
+      return {
+        ...state,
+        translations: translationsWithoutDeleted,
+        collection: {
+          ...state.collection,
+          translationsQuantity: state.collection.translationsQuantity - 1,
+        },
+      };
     case CHECK_TRANSLATION:
-      const translations = state.translations.map((translation) =>
-        translation.id === payload.id
-          ? { ...translation, isLearned: !translation.isLearned }
-          : translation
-      );
-      return { ...state, translations };
+      let newLearnedQuantity = 0;
+
+      const translations = state.translations.map((translation) => {
+        if (translation.id !== payload.id) return translation;
+
+        translation.isLearned ? newLearnedQuantity-- : newLearnedQuantity++;
+
+        return { ...translation, isLearned: !translation.isLearned };
+      });
+
+      return {
+        ...state,
+        translations,
+        collection: {
+          ...state.collection,
+          learnedQuantity:
+            state.collection.learnedQuantity + newLearnedQuantity,
+        },
+      };
     case CLEAR_TRANSLATIONS:
       return { ...state, translations: [] };
     case GET_TRANSLATIONS_IDS:

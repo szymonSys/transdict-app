@@ -9,7 +9,7 @@ import {
   useParams,
 } from "react-router-dom";
 
-import Collection from "../containers/Collection";
+import Collection from "../containers/Collection/Collection";
 
 export default function CollectionView() {
   return (

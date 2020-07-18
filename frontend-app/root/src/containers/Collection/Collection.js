@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
-import TranslationItem from "../../components/Translations/TranslationItem";
+import Translation from "../Translations/Translation";
+import {
+  CHECK_TRANSLATION,
+  DELETE_TRANSLATION,
+} from "../../services/transdict-API/actionsTypes";
+
+import { checkType } from "../../shared/utils";
 
 import {
   useHistory,
@@ -36,41 +42,55 @@ function Collection({
   // TODO: add loading state to reducers, add messages, update sort and order reducers with reset translations
 
   const { name: collectionName, id: collectionId } = useParams();
+
   const {
     translations,
     collection: { translationsQuantity, learnedQuantity },
   } = translationsObject;
 
-  const checkIfFetchedAddTranslations = () =>
+  const checkIfFetchedTranslations = () =>
     !translations.length || translations.length < translationsQuantity;
 
-  const [shouldExecute, setShouldExecute] = useState(
-    checkIfFetchedAddTranslations()
-  );
+  const handleClick = (event) => {
+    const { translationId, action } = event?.target?.dataset;
 
-  useEffect(() => {
-    setShouldExecute(checkIfFetchedAddTranslations());
-  }, [translations.length, translationsQuantity]);
+    if (!checkType("string", translationId)) return;
+
+    const parsedCollectionId = parseInt(collectionId);
+    const parsedTranslationId = parseInt(translationId);
+
+    switch (action) {
+      case CHECK_TRANSLATION:
+        checkTranslation(parsedTranslationId, parsedCollectionId);
+        break;
+      case DELETE_TRANSLATION:
+        deleteTranslation(parsedTranslationId, parsedCollectionId);
+        break;
+      default:
+        return;
+    }
+  };
 
   return (
     <div>
       <h2>{collectionName}</h2>
+      <p>
+        {learnedQuantity}/{translationsQuantity} ---{" "}
+        {`${((learnedQuantity / translationsQuantity) * 100).toFixed()}%`}
+      </p>
       <WithInfiniteScroll
         callback={() => getTranslations(collectionId)}
-        shouldExecute={shouldExecute}
+        executionOptions={{
+          condition: checkIfFetchedTranslations,
+          deps: [translations.length, translationsQuantity],
+        }}
       >
         {(ref) => (
-          <div>
-            {translations.map((translation) => (
-              <TranslationItem
-                translation={translation}
-                handleCheck={checkTranslation}
-                handleDelete={deleteTranslation}
-              />
+          <div onClick={handleClick}>
+            {translations.map((translation, index) => (
+              <Translation key={index} translation={translation} />
             ))}
-            <footer ref={ref}>
-              <h2>FOOTER</h2>
-            </footer>
+            <div ref={ref} />
           </div>
         )}
       </WithInfiniteScroll>
