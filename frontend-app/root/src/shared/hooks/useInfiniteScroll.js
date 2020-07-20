@@ -40,6 +40,8 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
 
   useEffect(() => {
     handleScroll(ref.current);
+    return () =>
+      intersectionObserver.current && intersectionObserver.current.disconnect();
   }, [shouldExecute]);
 
   return ref;

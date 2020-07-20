@@ -8,6 +8,7 @@ import {
 } from "../../services/transdict-API/actionsTypes";
 
 import { checkType } from "../../shared/utils";
+import useMessage from "../../shared/hooks/useMessage";
 
 import {
   useHistory,
@@ -27,6 +28,8 @@ import {
   toggleMode,
 } from "../../actions/translations";
 
+import { deleteMessage } from "../../actions/messages";
+
 function Collection({
   getTranslations,
   deleteTranslation,
@@ -37,11 +40,19 @@ function Collection({
   toggleMode,
   setLearned,
   translations: translationsObject,
+  deleteMessage,
   messages,
 }) {
   // TODO: add loading state to reducers, add messages, update sort and order reducers with reset translations
 
   const { name: collectionName, id: collectionId } = useParams();
+
+  const message = useMessage(
+    "translationsMsg",
+    () => deleteMessage("translationsMsg"),
+    3000,
+    [messages.translationsMsg?.text]
+  );
 
   const {
     translations,
@@ -74,6 +85,7 @@ function Collection({
   return (
     <div>
       <h2>{collectionName}</h2>
+      <p>{message?.text}</p>
       <p>
         {learnedQuantity}/{translationsQuantity} ---{" "}
         {`${((learnedQuantity / translationsQuantity) * 100).toFixed()}%`}
@@ -102,17 +114,27 @@ const mapStateToProps = (state) => ({
   translations: state.translations,
   messages: state.messages,
 });
+
 const mapDispatchToProps = (dispatch) => ({
   getTranslations: (collectionId) => dispatch(getTranslations(collectionId)),
+
   deleteTranslation: (translationId, collectionId) =>
     dispatch(deleteTranslation({ translationId, collectionId })),
+
   checkTranslation: (translationId, collectionId) =>
     dispatch(checkTranslation({ translationId, collectionId })),
+
   setTranslationsSortBy: (sortBy) => dispatch(setTranslationsSortBy(sortBy)),
+
   toggleTranslationsOrder: () => dispatch(toggleTranslationsOrder()),
+
   setTranslationsLimit: (limit) => dispatch(setTranslationsLimit(limit)),
+
   toggleMode: () => dispatch(toggleMode()),
+
   setLearned: (options) => dispatch(setLearned(options)),
+
+  deleteMessage: (messageName) => dispatch(deleteMessage(messageName)),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Collection);
