@@ -17,6 +17,7 @@ const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
 const initialState = {
   collections: [],
+  collectionsQuantity: null,
   sortBy: SORT_DEFAULT,
   sortDirection: DEFAULT_ORDER,
   limit: DEFAULT_LIMIT,
@@ -27,7 +28,11 @@ export default function (state = { ...initialState }, action) {
 
   switch (type) {
     case UPDATE_COLLECTIONS:
-      return { ...state, collections: [...state.collections, payload] };
+      return {
+        ...state,
+        collections: [...state.collections, ...payload.collections],
+        collectionsQuantity: payload.collectionsQuantity,
+      };
     case CLEAR_COLLECTIONS:
       return { ...state, collections: [] };
     case SET_COLLECTIONS_SORT_BY:

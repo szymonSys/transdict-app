@@ -318,6 +318,8 @@ def get_collections_with_limit_and_offset(current_user):
 
   order_by = order_by_options.get(sort_by)
 
+  collections_quantity = db.session.query(Collection.id).filter(db.and_(Collection.userId==current_user.id)).count()
+
   learned_by_collection_sq = db.session.query(Collection.id.label('c_id'), func.count(TranslationStatus.id).label('learned')).outerjoin(Collection, Collection.id==TranslationStatus.collectionId).filter(db.and_(TranslationStatus.isLearned==True, Collection.userId==current_user.id)).group_by(Collection.id).subquery()
 
   
@@ -336,7 +338,7 @@ def get_collections_with_limit_and_offset(current_user):
 
     response_collections.append(collection)
 
-  return jsonify({'collections': response_collections,'limit': int(limit), 'offset': int(offset), 'contentIsSent': True})
+  return jsonify({'collections': response_collections, 'collectionsQuantity': collections_quantity, 'limit': int(limit), 'offset': int(offset), 'contentIsSent': True})
 
 
 

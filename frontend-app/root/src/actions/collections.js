@@ -27,17 +27,13 @@ import { checkType } from "../shared/utils";
 
 const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
-export const getUserCollections = ({
-  sortBy = SORT_DEFAULT,
-  sortDirection = DEFAULT_ORDER,
-  limit = DEFAULT_LIMIT,
-} = {}) => async (dispatch, getState) => {
-  const token = getState().auth.token;
+export const getUserCollections = () => async (dispatch, getState) => {
+  const { token } = getState().auth;
+
+  const { sortBy, limit, sortDirection, collections } = getState().collections;
 
   return handleGetCollections(token, dispatch, getState, {
-    offset: Array.isArray(getState().collections)
-      ? getState().collections.length
-      : 0,
+    offset: Array.isArray(collections) ? collections.length : 0,
     limit,
     sortBy,
     sortDirection,
@@ -224,9 +220,17 @@ async function handleGetCollections(
       throw new Error("Collections have not been sent!");
     }
 
-    const collections = response?.collections ? response.collections : [];
+    const { collections, collectionsQuantity } = response;
 
-    await dispatch({ type: UPDATE_COLLECTIONS, payload: collections });
+    // const collections = response?.collections ? response.collections : [];
+
+    await dispatch({
+      type: UPDATE_COLLECTIONS,
+      payload: {
+        collections: Array.isArray(collections) ? collections : [],
+        collectionsQuantity,
+      },
+    });
 
     dispatch(
       createMessage(

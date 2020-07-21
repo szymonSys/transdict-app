@@ -9,6 +9,7 @@ import {
 
 import { checkType } from "../../shared/utils";
 import useMessage from "../../shared/hooks/useMessage";
+import useAction from "../../shared/hooks/useAction";
 
 import {
   useHistory,
@@ -26,6 +27,7 @@ import {
   toggleOrder as toggleTranslationsOrder,
   setSortBy as setTranslationsSortBy,
   toggleMode,
+  resetTranslationsStore,
 } from "../../actions/translations";
 
 import { deleteMessage } from "../../actions/messages";
@@ -41,11 +43,21 @@ function Collection({
   setLearned,
   translations: translationsObject,
   deleteMessage,
+  resetTranslationsStore,
   messages,
 }) {
   // TODO: add loading state to reducers, add messages, update sort and order reducers with reset translations
 
   const { name: collectionName, id: collectionId } = useParams();
+
+  const {
+    translations,
+    isDictMode,
+    collection: { id: cId, translationsQuantity, learnedQuantity },
+  } = translationsObject;
+
+  useAction(() => !isDictMode && toggleMode());
+  useAction(() => parseInt(collectionId) !== cId && resetTranslationsStore());
 
   const message = useMessage(
     "translationsMsg",
@@ -53,11 +65,6 @@ function Collection({
     3000,
     [messages.translationsMsg?.text]
   );
-
-  const {
-    translations,
-    collection: { translationsQuantity, learnedQuantity },
-  } = translationsObject;
 
   const checkIfFetchedTranslations = () =>
     !translations.length || translations.length < translationsQuantity;
@@ -87,6 +94,7 @@ function Collection({
       <h2>{collectionName}</h2>
       <p>{message?.text}</p>
       <p>
+        {isDictMode}
         {learnedQuantity}/{translationsQuantity} ---{" "}
         {`${((learnedQuantity / translationsQuantity) * 100).toFixed()}%`}
       </p>
@@ -135,6 +143,8 @@ const mapDispatchToProps = (dispatch) => ({
   setLearned: (options) => dispatch(setLearned(options)),
 
   deleteMessage: (messageName) => dispatch(deleteMessage(messageName)),
+
+  resetTranslationsStore: () => dispatch(resetTranslationsStore()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Collection);

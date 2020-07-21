@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
+import CollectionsList from "../containers/Collection/CollectionsList";
 import {
   Redirect,
   Switch,
@@ -12,6 +13,7 @@ export default function MyCollectionsView() {
   return (
     <div>
       <p>MyCollectionsView</p>
+      <CollectionsList />
     </div>
   );
 }
