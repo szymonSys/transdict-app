@@ -258,7 +258,9 @@ def add_collection(current_user):
   current_user.collections.append(new_collection)
   db.session.commit()
 
-  return jsonify({'isAdded': True, 'newCollectionName': new_collection.name})
+  new_collection_response = {"id": new_collection.id, "name": new_collection.name, "createdAt": new_collection.createdAt, "updatedAt": new_collection.updatedAt, "translationsQuantity": 0, "learnedQuantity": 0}
+
+  return jsonify({'isAdded': True, 'newCollection': new_collection_response})
 
 
 
@@ -323,18 +325,24 @@ def get_collections_with_limit_and_offset(current_user):
   learned_by_collection_sq = db.session.query(Collection.id.label('c_id'), func.count(TranslationStatus.id).label('learned')).outerjoin(Collection, Collection.id==TranslationStatus.collectionId).filter(db.and_(TranslationStatus.isLearned==True, Collection.userId==current_user.id)).group_by(Collection.id).subquery()
 
   
-  collections = db.session.query(Collection, func.count(TranslationStatus.id).label('total'), learned_by_collection_sq.c.learned.label('learned')).outerjoin(Collection, Collection.id == TranslationStatus.collectionId).outerjoin(learned_by_collection_sq , Collection.id==learned_by_collection_sq.c.c_id).filter(db.and_(Collection.userId==current_user.id)).group_by(Collection).order_by(set_direction(sort_direction)(order_by)).all()
+  collections = db.session.query(Collection, func.count(TranslationStatus.id).label('total'), learned_by_collection_sq.c.learned.label('learned')).outerjoin(TranslationStatus, Collection.id == TranslationStatus.collectionId).outerjoin(learned_by_collection_sq , Collection.id==learned_by_collection_sq.c.c_id).filter(db.and_(Collection.userId==current_user.id)).group_by(Collection).order_by(set_direction(sort_direction)(order_by)).limit(limit).offset(offset).all()
 
   response_collections = []
 
   for collection_data in collections:
     collection = {}
+    translationsQuantity = 0
+    learnedQuantity = 0
     collection['name'] = collection_data[0].name
     collection['id'] = collection_data[0].id
     collection['createdAt'] = collection_data[0].createdAt
     collection['updatedAt'] = collection_data[0].updatedAt
-    collection['translationsQauntity'] = collection_data[1]
-    collection['learnedQuantity'] = collection_data[2]
+    if collection_data[1] != None:
+      translationsQuantity = collection_data[1]
+    if collection_data[2] != None:
+      learnedQuantity = collection_data[2]
+    collection['translationsQuantity'] = translationsQuantity
+    collection['learnedQuantity'] = learnedQuantity
 
     response_collections.append(collection)
 

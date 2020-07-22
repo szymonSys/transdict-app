@@ -5,6 +5,9 @@ export default function WithInfiniteScroll({
   callback,
   executionOptions,
 }) {
-  const observedRef = useInfiniteScroll(callback, executionOptions);
-  return children(observedRef);
+  const [observedRef, isLoading] = useInfiniteScroll(
+    callback,
+    executionOptions
+  );
+  return children(observedRef, isLoading);
 }

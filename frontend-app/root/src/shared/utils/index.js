@@ -5,6 +5,8 @@ export const checkType = (type, ...variables) => {
   return !variables.some((variable) => typeof variable !== type);
 };
 
+export const isNaN = (value) => value !== value;
+
 export async function handleFetch(url, requestOptions) {
   try {
     const response = await fetch(url, requestOptions);

@@ -1,3 +1,6 @@
+import { createMessage, MESSAGE_TYPES } from "./messages";
+import { checkType } from "../shared/utils";
+
 import {
   addCollection as addCollectionRequest,
   deleteCollection as deleteCollectionRequest,
@@ -6,11 +9,13 @@ import {
 
 import {
   UPDATE_COLLECTIONS,
-  CLEAR_COLLECTIONS,
   RESET_COLLECTIONS_STORE,
   SET_COLLECTIONS_SORT_BY,
   SET_COLLECTIONS_LIMIT,
   SET_COLLECTIONS_ORDER,
+  DELETE_COLLECTION,
+  ADD_COLLECTION,
+  CLEAR_COLLECTIONS,
 } from "./types";
 
 import {
@@ -20,10 +25,6 @@ import {
   ASC_ORDER,
   DESC_ORDER,
 } from "../services/transdict-API/actionsTypes";
-
-import { createMessage, MESSAGE_TYPES } from "./messages";
-
-import { checkType } from "../shared/utils";
 
 const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
@@ -47,11 +48,11 @@ export const addCollection = (collectionName) => async (dispatch, getState) => {
     }
 
     const token = getState().auth.token;
-    const response = await addCollectionRequest(token, dispatch, {
-      collectionName,
+    const response = await addCollectionRequest(token, {
+      name: collectionName,
     });
 
-    const { isAdded, newCollectionName } = response;
+    const { isAdded, newCollection } = response;
 
     if (!Boolean(isAdded)) {
       dispatch(
@@ -64,22 +65,15 @@ export const addCollection = (collectionName) => async (dispatch, getState) => {
 
       throw new Error("Collection has not been added!");
     } else {
+      await dispatch({ type: ADD_COLLECTION, payload: newCollection });
+
       dispatch(
         createMessage(
           MESSAGE_TYPES.success,
           "collectionAddMsg",
-          `Collection ${newCollectionName} has been added`
+          `Collection ${newCollection.name} has been added`
         )
       );
-
-      return handleGetCollections(token, getState, {
-        offset: 0,
-        limit: Array.isArray(getState().collections)
-          ? getState().collections.length
-          : DEFAULT_LIMIT,
-        sortBy: SORT_DEFAULT,
-        sortDirection: DEFAULT_ORDER,
-      });
     }
   } catch (err) {
     console.error(err);
@@ -97,7 +91,11 @@ export const deleteCollection = (collectionId) => async (
       collectionId,
     });
 
-    const { isDeleted, deletedCollectionName } = response;
+    const {
+      isDeleted,
+      deletedCollectionName,
+      deletedCollectionId: id,
+    } = response;
 
     if (!Boolean(isDeleted)) {
       dispatch(
@@ -110,6 +108,8 @@ export const deleteCollection = (collectionId) => async (
 
       throw new Error("Collection has not been deleted!");
     } else {
+      await dispatch({ type: DELETE_COLLECTION, payload: { id } });
+
       dispatch(
         createMessage(
           MESSAGE_TYPES.success,
@@ -117,15 +117,6 @@ export const deleteCollection = (collectionId) => async (
           `Collection ${deletedCollectionName} has been deleted`
         )
       );
-
-      return handleGetCollections(token, dispatch, getState, {
-        offset: 0,
-        limit: Array.isArray(getState().collections)
-          ? getState().collections.length
-          : DEFAULT_LIMIT,
-        sortBy: SORT_DEFAULT,
-        sortDirection: DEFAULT_ORDER,
-      });
     }
   } catch (err) {
     console.error(err);
@@ -187,6 +178,9 @@ export const setSortBy = (sortBy) => async (dispatch) => {
   }
 };
 
+export const clearCollections = () => (dispatch) =>
+  dispatch({ type: CLEAR_COLLECTIONS });
+
 export const resetCollectionsStore = () => (dispatch) =>
   dispatch({ type: RESET_COLLECTIONS_STORE });
 
@@ -221,8 +215,6 @@ async function handleGetCollections(
     }
 
     const { collections, collectionsQuantity } = response;
-
-    // const collections = response?.collections ? response.collections : [];
 
     await dispatch({
       type: UPDATE_COLLECTIONS,

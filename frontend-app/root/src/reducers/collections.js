@@ -5,6 +5,8 @@ import {
   SET_COLLECTIONS_SORT_BY,
   SET_COLLECTIONS_LIMIT,
   SET_COLLECTIONS_ORDER,
+  DELETE_COLLECTION,
+  ADD_COLLECTION,
 } from "../actions/types";
 
 import {
@@ -32,6 +34,21 @@ export default function (state = { ...initialState }, action) {
         ...state,
         collections: [...state.collections, ...payload.collections],
         collectionsQuantity: payload.collectionsQuantity,
+      };
+    case ADD_COLLECTION:
+      return {
+        ...state,
+        collections: [{ ...payload }, ...state.collections],
+        collectionsQuantity: state.collectionsQuantity + 1,
+      };
+    case DELETE_COLLECTION:
+      const collectionsWithoutDeleted = state.collections.filter(
+        (collection) => collection.id !== payload.id
+      );
+      return {
+        ...state,
+        collections: collectionsWithoutDeleted,
+        collectionsQuantity: state.collectionsQuantity - 1,
       };
     case CLEAR_COLLECTIONS:
       return { ...state, collections: [] };

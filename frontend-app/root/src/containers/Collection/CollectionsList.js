@@ -1,22 +1,18 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { connect } from "react-redux";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
+import Collection from "./Collection";
 
 import { checkType } from "../../shared/utils";
 import useMessage from "../../shared/hooks/useMessage";
+import useAction from "../../shared/hooks/useAction";
 
-import {
-  useHistory,
-  useLocation,
-  useParams,
-  useRouteMatch,
-  Link,
-} from "react-router-dom";
+import { useRouteMatch } from "react-router-dom";
 
 import {
   getUserCollections,
   deleteCollection,
-  addCollection,
+  clearCollections,
 } from "../../actions/collections";
 
 import { deleteMessage } from "../../actions/messages";
@@ -24,46 +20,43 @@ import { deleteMessage } from "../../actions/messages";
 function CollectionsList({
   getUserCollections,
   deleteCollection,
-  addCollection,
+  clearCollections,
   deleteMessage,
   messages,
   collections: collectionsObject,
 }) {
-  // const { name: collectionName, id: collectionId } = useParams();
-
   const message = useMessage(
-    "CollectionssMsg",
-    () => deleteMessage("CollectionssMsg"),
+    "CollectionsMsg",
+    () => deleteMessage("CollectionsMsg"),
     3000,
     [messages.CollectionssMsg?.text]
   );
 
   const { url } = useRouteMatch();
 
-  const { collections, collectionsQuantity } = collectionsObject;
+  const {
+    collections,
+    collectionsQuantity,
+    sortBy,
+    sortDirection,
+  } = collectionsObject;
 
   const checkIfFetchedCollections = () =>
     !collections.length || collections.length < collectionsQuantity;
 
-  // const handleClick = (event) => {
-  //   const { translationId, action } = event?.target?.dataset;
+  const handleClick = (event) => {
+    const { collectionId, action } = event?.target?.dataset;
 
-  //   if (!checkType("string", translationId)) return;
+    if (!checkType("string", collectionId) || action !== "delete_collection")
+      return;
 
-  //   const parsedCollectionId = parseInt(collectionId);
-  //   const parsedTranslationId = parseInt(translationId);
+    deleteCollection(parseInt(collectionId));
+  };
 
-  //   switch (action) {
-  //     case CHECK_TRANSLATION:
-  //       checkTranslation(parsedTranslationId, parsedCollectionId);
-  //       break;
-  //     case DELETE_TRANSLATION:
-  //       deleteTranslation(parsedTranslationId, parsedCollectionId);
-  //       break;
-  //     default:
-  //       return;
-  //   }
-  // };
+  useAction(() => collections.length && clearCollections(), [
+    sortBy,
+    sortDirection,
+  ]);
 
   return (
     <div>
@@ -75,16 +68,21 @@ function CollectionsList({
           deps: [collections.length, collectionsQuantity],
         }}
       >
-        {(ref) => (
+        {(ref, isLoading) => (
           <div>
-            {collections.map((collection) => (
-              <div key={collection.id}>
-                <Link to={`${url}/${collection.name}/${collection.id}`}>
-                  {collection.name}
-                </Link>
-              </div>
-            ))}
-            <div ref={ref} />
+            <div onClick={handleClick} style={{ marginBottom: 80 }}>
+              {collections.map((collection) => (
+                <Collection
+                  key={collection.id}
+                  collection={collection}
+                  url={`${url}/${collection.name}/${collection.id}`}
+                />
+              ))}
+            </div>
+            <div style={{ height: 1 }} ref={ref} />
+            <h2 style={{ position: "fixed", bottom: 0 }}>
+              {isLoading ? "Loading..." : ""}
+            </h2>
           </div>
         )}
       </WithInfiniteScroll>
@@ -98,13 +96,13 @@ const mapStateToProps = (state) => ({
 });
 
 const mapDispatchToProps = (dispatch) => ({
-  addCollection: (collectionName) => dispatch(addCollection(collectionName)),
-
   getUserCollections: () => dispatch(getUserCollections()),
 
   deleteCollection: (collectionId) => dispatch(deleteCollection(collectionId)),
 
   deleteMessage: (messageName) => dispatch(deleteMessage(messageName)),
+
+  clearCollections: () => dispatch(clearCollections()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CollectionsList);

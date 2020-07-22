@@ -52,7 +52,11 @@ export default function (state = initialState, action) {
     case ADD_TRANSLATION:
       return {
         ...state,
-        translations: [...state.translations, { ...payload }],
+        translations: [{ ...payload }, ...state.translations],
+        collection: {
+          ...state.collection,
+          translationsQuantity: state.collection.translationsQuantity + 1,
+        },
       };
     case DELETE_TRANSLATION:
       const translationsWithoutDeleted = state.translations.filter(

@@ -8,6 +8,8 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
 
   const { condition, deps } = executionOptions;
 
+  const [isLoading, setLoading] = useState(false);
+
   const [shouldExecute, setShouldExecute] = useState(
     checkType("function", condition) ? condition() : !!condition
   );
@@ -17,6 +19,7 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
       setShouldExecute(
         checkType("function", condition) ? condition() : !!condition
       );
+      isLoading && setLoading(false);
     },
     Array.isArray(deps) ? deps : []
   );
@@ -29,9 +32,16 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
 
       intersectionObserver.current && intersectionObserver.current.disconnect();
 
-      intersectionObserver.current = new IntersectionObserver(([entrie]) => {
-        entrie.intersectionRatio > 0 && !!shouldExecute && actionCallback();
-      });
+      intersectionObserver.current = new IntersectionObserver(
+        async ([entrie]) => {
+          if (entrie.intersectionRatio > 0 && !!shouldExecute) {
+            setLoading(true);
+            actionCallback();
+            // setTimeout(actionCallback, 300);
+            // await Promise.resolve().then(() => setTimeout(actionCallback, 300));
+          }
+        }
+      );
 
       if (node && shouldExecute) intersectionObserver.current.observe(node);
     },
@@ -44,7 +54,7 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
       intersectionObserver.current && intersectionObserver.current.disconnect();
   }, [shouldExecute]);
 
-  return ref;
+  return [ref, isLoading];
 };
 
 export default useInfiniteScroll;

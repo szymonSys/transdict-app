@@ -1,4 +1,5 @@
 import handleRequest from "../handleRequest";
+
 import {
   CHECK_TRANSLATION,
   ADD_TRANSLATION,
@@ -6,7 +7,9 @@ import {
   TRANSLATIONS_SORT_OPTIONS,
   COLLECTIONS_SORT_OPTIONS,
   DEFAULT_ORDER,
+  DEFAULT_LIMIT,
 } from "./actionsTypes";
+
 import {
   getLoginURL,
   getLogoutURL,
@@ -75,10 +78,8 @@ export function updateCollection(
   );
 }
 
-export function addCollection(
-  token = null,
-  { collectionName: name = null } = {}
-) {
+export function addCollection(token = null, { name = null } = {}) {
+  console.log(name);
   return handleRequest(getNewCollectionURL(), {
     method: "POST",
     token,
@@ -96,7 +97,7 @@ export function deleteCollection(token = null, { collectionId = null } = {}) {
 export function getUserCollections(
   token = null,
   {
-    limit = 20,
+    limit = DEFAULT_LIMIT,
     offset = 0,
     sortBy = SORT_COLLECTIONS_DEFAULT,
     sortDirection = DEFAULT_ORDER,
