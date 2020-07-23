@@ -1,21 +1,19 @@
 import React from "react";
-import { connect } from "react-redux";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
 import Collection from "./Collection";
-
-import { checkType } from "../../shared/utils";
 import useMessage from "../../shared/hooks/useMessage";
 import useAction from "../../shared/hooks/useAction";
 
+import { connect } from "react-redux";
+import { checkType } from "../../shared/utils";
 import { useRouteMatch } from "react-router-dom";
+import { deleteMessage } from "../../actions/messages";
 
 import {
   getUserCollections,
   deleteCollection,
   clearCollections,
 } from "../../actions/collections";
-
-import { deleteMessage } from "../../actions/messages";
 
 function CollectionsList({
   getUserCollections,

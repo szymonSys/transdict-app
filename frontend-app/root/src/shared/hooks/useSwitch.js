@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export default function useSwitch(defaultState = [null, null]) {
   if (!Array.isArray(defaultState) || defaultState.length !== 2)

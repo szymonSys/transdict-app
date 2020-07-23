@@ -9,8 +9,8 @@ import {
 
 const initialState = {
   from: null,
-  to: null,
-  phrase: null,
+  to: "en",
+  phrase: "",
   translation: null,
   score: null,
 };

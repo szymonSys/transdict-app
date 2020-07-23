@@ -20,7 +20,7 @@ const {
   phrases: { from: fromLanguage, to: toLanguage },
 } = store.getState();
 
-export const translate = (
+export const translate = async (
   text,
   { toLanguage, fromLanguage, toScript = null } = {}
 ) => async (dispatch, getState) => {
