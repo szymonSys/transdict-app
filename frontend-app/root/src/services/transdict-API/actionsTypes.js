@@ -21,7 +21,7 @@ export const COLLECTIONS_SORT_OPTIONS = Object.freeze({
   SORT_BY_CREATED_AT: "createdAt",
   SORT_BY_UPDATED_AT: "updatedAt",
   SORT_BY_ID: "id",
-  SORT_DEFAULT: "id",
+  SORT_DEFAULT: "updatedAt",
 });
 
 export const TRANSLATIONS_SORT_OPTIONS = Object.freeze({

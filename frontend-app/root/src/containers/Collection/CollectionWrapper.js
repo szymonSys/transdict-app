@@ -20,6 +20,7 @@ import {
   checkTranslation,
   toggleMode,
   resetTranslationsStore,
+  clearTranslations,
 } from "../../actions/translations";
 
 function CollectionWrapper({
@@ -30,11 +31,14 @@ function CollectionWrapper({
   translations: translationsObject,
   deleteMessage,
   resetTranslationsStore,
+  clearTranslations,
   messages,
 }) {
   const {
     translations,
     isDictMode,
+    sortBy,
+    sortDirection,
     collection: { id: cId, translationsQuantity, learnedQuantity },
   } = translationsObject;
 
@@ -72,6 +76,10 @@ function CollectionWrapper({
 
   useAction(() => !isDictMode && toggleMode());
   useAction(() => parseInt(collectionId) !== cId && resetTranslationsStore());
+  useAction(() => translations.length && clearTranslations(), [
+    sortBy,
+    sortDirection,
+  ]);
 
   return (
     <div>
@@ -129,6 +137,8 @@ const mapDispatchToProps = (dispatch) => ({
   deleteMessage: (messageName) => dispatch(deleteMessage(messageName)),
 
   resetTranslationsStore: () => dispatch(resetTranslationsStore()),
+
+  clearTranslations: () => dispatch(clearTranslations()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(CollectionWrapper);

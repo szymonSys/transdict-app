@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React from "react";
 import CollectionsList from "../containers/Collection/CollectionsList";
 import AddCollection from "../containers/Collection/AddCollection";
 import CollectionsSorting from "../containers/Collection/CollectionsSorting";
