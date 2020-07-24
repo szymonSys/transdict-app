@@ -1,20 +1,13 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { checkType } from "../utils";
-import { translate as translateRequest } from "../../actions/phrases";
+import { translate as translateAction } from "../../actions/phrases";
 import store from "../../store";
 
 const { score, ...initialTranslateValues } = store.getState().phrases;
 
-const {
-  translation: storeTranslation,
-  phrase: storePhrase,
-  from: storeFrom,
-  to: storeTo,
-} = initialTranslateValues;
-
 export default function useTranslate(
-  initialValues = initialTranslateValues,
-  callback = null
+  callback = null,
+  initialValues = initialTranslateValues
 ) {
   const [translateValues, setTranslateValues] = useState(
     checkInitialValues(initialValues)
@@ -27,11 +20,26 @@ export default function useTranslate(
   const setState = (newState) =>
     setTranslateValues((prevState) => setValues(prevState, newState));
 
+  const timeoutIdRef = useRef();
+
   const translate = async () => {
     const [translateProps, isValid] = valid(translateValues);
     if (isValid) {
+      const {
+        phrase: text,
+        from: fromLanguage,
+        to: toLanguage,
+      } = translateProps;
       setLoading(true);
-      await translateRequest(translateProps);
+      await store.dispatch(
+        translateAction(text, {
+          fromLanguage,
+          toLanguage,
+          toScript: null,
+        })
+      );
+      const { from, ...restValues } = store.getState().phrases;
+      setState(restValues);
       checkType("function", callback) && callback();
     } else {
       console.log("translate props is not valid");
@@ -39,14 +47,18 @@ export default function useTranslate(
   };
 
   useEffect(() => {
-    isLoading ? setLoading(false) : translate();
-    // !isLoading && translate();
-  }, [phrase, translation, from, to]);
+    isLoading && setLoading(false);
+  }, [isLoading]);
 
   useEffect(() => {
-    setState(initialTranslateValues);
-    // isLoading && setLoading(false);
-  }, [storePhrase, storeTranslation, storeFrom, storeTo, score]);
+    translation !== null && translate();
+  }, [from, to]);
+
+  useEffect(() => {
+    timeoutIdRef.current && clearTimeout(timeoutIdRef.current);
+    if (to && phrase !== initialTranslateValues.phrase)
+      timeoutIdRef.current = setTimeout(translate, 2000);
+  }, [phrase]);
 
   return { translateValues, isLoading, setState, translate };
 }
@@ -69,7 +81,7 @@ const setValues = (prevValues, newValues) => {
       checkValue(prevValues, entrie[0])
         ? { ...values, [entrie[0]]: entrie[1] }
         : values,
-    {}
+    prevValues
   );
 };
 

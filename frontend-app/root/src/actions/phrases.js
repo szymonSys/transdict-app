@@ -20,11 +20,13 @@ const {
   phrases: { from: fromLanguage, to: toLanguage },
 } = store.getState();
 
-export const translate = async (
+export const translate = (
   text,
   { toLanguage, fromLanguage, toScript = null } = {}
 ) => async (dispatch, getState) => {
-  if (typeof text !== "string" || text === "") return;
+  console.log(toLanguage, fromLanguage, toScript);
+  if (typeof text !== "string" || text === "")
+    throw new Error("Invalid argument of translate");
 
   try {
     const response = await translateRequest(text, {

@@ -1,5 +1,6 @@
 import React from "react";
 import Languages from "../Languages";
+import LanguagesList from "../../components/Languages/LanguagesList";
 import WithTranslate from "../../shared/containers/WithTranslate";
 import WithSwitch from "../../shared/containers/WithSwitch";
 
@@ -19,9 +20,10 @@ function Translator({
   collections,
   messages,
 }) {
-  // TODO: useLanguages, withLanguages*, withRedirection, handle all actions, addToCollections
+  // TODO: withRedirection, handle all actions, addToCollections
+  let timeoutId = null;
   return (
-    <WithTranslate>
+    <WithTranslate callback={() => console.log("translation success!")}>
       {({ translateValues, isLoading, setTranslateValues, translate }) => (
         <WithSwitch
           primary={translateValues.from}
@@ -29,7 +31,57 @@ function Translator({
         >
           {({ switchables, reverse, setSwitchables }) => (
             <div>
-              <Languages setLanguages={setSwitchables} />
+              <textarea
+                onChange={(e) => setTranslateValues({ phrase: e.target.value })}
+                value={translateValues.phrase}
+              />
+              <button onClick={translate}>translate</button>
+              <span>{phrase.translation}</span>
+              <h2>Languages</h2>
+              <Languages>
+                {({ sortedLanguagesEntries }) => (
+                  <div>
+                    <h3>Phrase's language</h3>
+                    <button
+                      onClick={() => {
+                        setTranslateValues({ from: null });
+                        setSwitchables(null, 1);
+                      }}
+                    >
+                      Wykryj język
+                    </button>
+                    <LanguagesList
+                      setLanguageName={setSwitchables}
+                      setLanguageKey={(key) =>
+                        setTranslateValues({ from: key })
+                      }
+                      languagesEntries={sortedLanguagesEntries}
+                      which={1}
+                    />
+                    <button
+                      onClick={() => {
+                        reverse();
+                        setTranslateValues({
+                          from: translateValues.to,
+                          to: translateValues.from,
+                          translation: translateValues.phrase,
+                          phrase: translateValues.translation,
+                        });
+                      }}
+                    >
+                      reverse
+                    </button>
+                    <h3>Translation's language</h3>
+                    <LanguagesList
+                      setLanguageName={setSwitchables}
+                      setLanguageKey={(key) => setTranslateValues({ to: key })}
+                      languagesEntries={sortedLanguagesEntries}
+                      which={2}
+                    />
+                    {/* {console.log(translateValues)} */}
+                  </div>
+                )}
+              </Languages>
             </div>
           )}
         </WithSwitch>

@@ -1,12 +1,12 @@
 import useTranslate from "../hooks/useTranslate";
 
-export default function WithTranslate({ children }) {
+export default function WithTranslate({ children, callback }) {
   const {
     translateValues,
     isLoading,
     setState: setTranslateValues,
     translate,
-  } = useTranslate();
+  } = useTranslate(callback);
   return children({
     translateValues,
     isLoading,
