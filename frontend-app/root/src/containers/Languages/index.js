@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { connect } from "react-redux";
 import { getLanguages } from "../../actions/languages";
 
@@ -7,11 +7,15 @@ function Languages({ languages, getLanguages, setLanguages }) {
     getLanguages();
   }, []);
 
-  const makeLanguagesList = (languages) => {
+  const sortLanguages = (languages) => {
     if (!languages) return;
     const languagesEntries = Array.from(languages);
     languagesEntries.sort((a, b) => (a[1].name < b[1].name ? -1 : 1));
-    return languagesEntries.map((entry) => {
+    return languagesEntries;
+  };
+
+  const makeLanguagesList = (entries) => {
+    return entries.map((entry) => {
       const [key, value] = entry;
       return (
         <div>
@@ -22,7 +26,12 @@ function Languages({ languages, getLanguages, setLanguages }) {
     });
   };
 
-  return <div>{makeLanguagesList(languages.languages)}</div>;
+  const sortedLanguagesEntries = useMemo(
+    () => sortLanguages(languages.languages),
+    []
+  );
+
+  return <div>{makeLanguagesList(sortedLanguagesEntries)}</div>;
 }
 
 const mapStateToProps = (state) => ({ languages: state.languages });
