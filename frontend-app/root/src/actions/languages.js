@@ -24,7 +24,7 @@ export const getLanguages = (translationLanguage = "pl") => async (
     await dispatch({ type: SET_LANGUAGES, payload: languages });
 
     !localStorage.getItem("languages") &&
-      localStorage.setItem("languages", languages);
+      localStorage.setItem("languages", JSON.stringify(languages));
 
     dispatch(
       createMessage(
@@ -43,7 +43,11 @@ export const getLanguages = (translationLanguage = "pl") => async (
 async function _getLanguagesObj() {
   const languagesFromStorage = localStorage.getItem("languages");
 
-  return languagesFromStorage
-    ? await JSON.parse(languagesFromStorage)
-    : await getLanguagesRequest()?.translation;
+  if (languagesFromStorage) {
+    return await JSON.parse(languagesFromStorage);
+  }
+
+  const languages = await getLanguagesRequest();
+
+  return languages.translation;
 }

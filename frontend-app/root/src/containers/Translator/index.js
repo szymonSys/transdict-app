@@ -1,14 +1,12 @@
-import React, { useState } from "react";
-
+import React from "react";
+import Languages from "../Languages";
 import WithTranslate from "../../shared/containers/WithTranslate";
 import WithSwitch from "../../shared/containers/WithSwitch";
 
-import { Redirect } from "react-router-dom";
 import { useTimeout } from "../../shared/hooks/useTime";
 import { translate } from "../../actions/phrases";
 import { addTranslation } from "../../actions/translations";
 import { getUserCollections } from "../../actions/collections";
-import { getLanguages } from "../../actions/languages";
 import { connect } from "react-redux";
 
 function Translator({
@@ -30,7 +28,9 @@ function Translator({
           secondary={translateValues.to}
         >
           {({ switchables, reverse, setSwitchables }) => (
-            <div>{console.log(switchables, isLoading)}</div>
+            <div>
+              <Languages setLanguages={setSwitchables} />
+            </div>
           )}
         </WithSwitch>
       )}

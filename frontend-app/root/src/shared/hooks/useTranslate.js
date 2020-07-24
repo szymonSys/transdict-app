@@ -40,10 +40,12 @@ export default function useTranslate(
 
   useEffect(() => {
     isLoading ? setLoading(false) : translate();
+    // !isLoading && translate();
   }, [phrase, translation, from, to]);
 
   useEffect(() => {
     setState(initialTranslateValues);
+    // isLoading && setLoading(false);
   }, [storePhrase, storeTranslation, storeFrom, storeTo, score]);
 
   return { translateValues, isLoading, setState, translate };
@@ -60,7 +62,8 @@ const checkInitialValues = (values) =>
     : { ...initialTranslateValues };
 
 const setValues = (prevValues, newValues) => {
-  if (!checkType("object", newValues) || newValues === null) return;
+  if (!checkType("object", newValues) || newValues === null)
+    throw new Error("newValues has to be type of object");
   return Object.entries(newValues).reduce(
     (values, entrie) =>
       checkValue(prevValues, entrie[0])
