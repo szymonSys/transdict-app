@@ -5,7 +5,6 @@ export default function useSwitch(defaultState = [null, null]) {
     defaultState = [null, null];
 
   const [state, setState] = useState([...defaultState]);
-  // const [shouldReverse, setShouldReverse] = useState(false);
 
   const reverse = useCallback(
     () => setState((prevState) => [prevState[1], prevState[0]]),
@@ -21,10 +20,6 @@ export default function useSwitch(defaultState = [null, null]) {
     },
     [state[0], state[1]]
   );
-
-  // useEffect(() => {
-  //   setState(defaultState);
-  // }, [defaultState[0], defaultState[1]]);
 
   return [[...state], reverse, setNewState];
 }

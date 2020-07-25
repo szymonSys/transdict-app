@@ -24,7 +24,6 @@ export const translate = (
   text,
   { toLanguage, fromLanguage, toScript = null } = {}
 ) => async (dispatch, getState) => {
-  console.log(toLanguage, fromLanguage, toScript);
   if (typeof text !== "string" || text === "")
     throw new Error("Invalid argument of translate");
 
