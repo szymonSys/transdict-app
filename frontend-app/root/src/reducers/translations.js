@@ -50,6 +50,7 @@ export default function (state = initialState, action) {
     case UPDATE_TRANSLATIONS:
       return { ...state, translations: [...state.translations, ...payload] };
     case ADD_TRANSLATION:
+      console.log(payload);
       return {
         ...state,
         translations: [{ ...payload }, ...state.translations],

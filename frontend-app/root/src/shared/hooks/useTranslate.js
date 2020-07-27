@@ -54,7 +54,6 @@ export default function useTranslate(
   }, [isLoading]);
 
   useEffect(() => {
-    console.log(prevState, translateValues);
     if (
       (prevState?.to !== to || prevState?.from !== from) &&
       checkType("string", translation, phrase)

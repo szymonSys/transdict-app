@@ -1,10 +1,15 @@
 import React from "react";
-import MainTranslatorWrapper from "../../components/Translations/MainTranslatorWrapper";
+// import MainTranslatorWrapper from "../../components/Translations/MainTranslatorWrapper";
 import WithTranslate from "../../shared/containers/WithTranslate";
 import WithSwitch from "../../shared/containers/WithSwitch";
 import { connect } from "react-redux";
 
-function MainTranslator({ phrase, languages }) {
+function TranslatorWithSwitchLanguages({
+  phrase,
+  languages,
+  Translator,
+  AddToCollection,
+}) {
   const handleChange = (translateValues, setTranslateValues, event) => {
     const newTranslateValues = { phrase: event.target.value };
     if (
@@ -60,7 +65,8 @@ function MainTranslator({ phrase, languages }) {
             setSwitchables: setCurrentLanguages,
           }) => (
             <div>
-              <MainTranslatorWrapper
+              <Translator
+                AddToCollection={AddToCollection}
                 translateValues={translateValues}
                 isLoading={isLoading}
                 languages={languages}
@@ -101,4 +107,4 @@ const mapStateToProps = (state) => ({
   messages: state.messages,
 });
 
-export default connect(mapStateToProps)(MainTranslator);
+export default connect(mapStateToProps)(TranslatorWithSwitchLanguages);

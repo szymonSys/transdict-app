@@ -326,15 +326,17 @@ export const checkTranslation = ({
     CHECK
   );
 
-export const addTranslation = (
-  { collectionId = null } = {},
-  {
-    primaryPhrase = null,
-    secondaryPhrase = null,
-    primaryLanguage = null,
-    secondaryLanguage = null,
-  } = {}
-) => async (dispatch, getState) => {
+export const addTranslation = (collectionId = null, translationProps) => async (
+  dispatch,
+  getState
+) => {
+  const {
+    primaryLanguage,
+    primaryPhrase,
+    secondaryLanguage,
+    secondaryPhrase,
+  } = translationProps;
+
   try {
     if (
       !(

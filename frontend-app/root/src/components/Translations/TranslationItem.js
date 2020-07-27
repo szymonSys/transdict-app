@@ -8,7 +8,7 @@ export default function TranslationItem({
   return (
     <div>
       <p>
-        {translation.primaryPhrase} [{translation.primatyLanguage}]
+        {translation.primaryPhrase} [{translation.primaryLanguage}]
       </p>
       <p>
         {translation.secondaryPhrase} [{translation.secondaryLanguage}]

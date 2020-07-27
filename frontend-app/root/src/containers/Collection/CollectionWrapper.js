@@ -103,8 +103,8 @@ function CollectionWrapper({
           <div>
             <div onClick={handleClick} style={{ marginBottom: 80 }}>
               {" "}
-              {translations.map((translation, index) => (
-                <Translation key={index} translation={translation} />
+              {translations.map((translation) => (
+                <Translation key={translation.id} translation={translation} />
               ))}
             </div>
             <div style={{ height: 1 }} ref={ref} />
