@@ -7,6 +7,42 @@ import { connect } from "react-redux";
 import { getUserCollections } from "../../actions/collections";
 
 function Translator({ phrase, languages, messages }) {
+  const handleChange = (translateValues, setTranslateValues, event) => {
+    const newTranslateValues = { phrase: event.target.value };
+    if (
+      event.target.value.length === 0 &&
+      translateValues.translation !== null
+    ) {
+      newTranslateValues.translation = null;
+    }
+    setTranslateValues(newTranslateValues);
+  };
+
+  const handleReverse = (
+    translateValues,
+    reverseCurrentLanguages,
+    setTranslateValues
+  ) => {
+    if (translateValues.from === null) return;
+    reverseCurrentLanguages();
+    setTranslateValues({
+      from: translateValues.to,
+      to: translateValues.from,
+      translation: translateValues.phrase,
+      phrase: translateValues.translation,
+    });
+  };
+
+  const handleSetAutoTranslation = (
+    translateValues,
+    setCurrentLanguages,
+    setTranslateValues
+  ) => {
+    if (translateValues.from === null) return;
+    setTranslateValues({ from: null });
+    setCurrentLanguages("Automatyczne wykrywanie", 1);
+  };
+
   return (
     <WithTranslate callback={() => console.log("translation success!")}>
       {({ translateValues, isLoading, setTranslateValues, translate }) => (
@@ -26,35 +62,31 @@ function Translator({ phrase, languages, messages }) {
               </h4>
               <h4>to: {currentLanguages[1]}</h4>
               <textarea
-                onChange={(e) => {
-                  const newTranslateValues = { phrase: e.target.value };
-                  if (
-                    e.target.value.length === 0 &&
-                    translateValues.translation !== null
-                  ) {
-                    newTranslateValues.translation = null;
-                  }
-                  setTranslateValues(newTranslateValues);
-                }}
-                value={isLoading ? "Loading..." : translateValues.phrase}
+                onChange={(event) =>
+                  handleChange(translateValues, setTranslateValues, event)
+                }
+                value={translateValues.phrase}
               />
               <button
-                onClick={() => {
-                  if (translateValues.from === null) return;
-                  reverseCurrentLanguages();
-                  setTranslateValues({
-                    from: translateValues.to,
-                    to: translateValues.from,
-                    translation: translateValues.phrase,
-                    phrase: translateValues.translation,
-                  });
-                }}
+                onClick={() =>
+                  handleReverse(
+                    translateValues,
+                    reverseCurrentLanguages,
+                    setTranslateValues
+                  )
+                }
               >
                 reverse
               </button>
               <textarea
                 disabled="disabled"
-                value={isLoading ? "Loading..." : translateValues.translation}
+                value={
+                  isLoading
+                    ? "Loading..."
+                    : translateValues.phrase
+                    ? translateValues.translation
+                    : ""
+                }
               />
 
               <h2>Languages</h2>
@@ -63,11 +95,13 @@ function Translator({ phrase, languages, messages }) {
                   <div>
                     <h3>Phrase's language</h3>
                     <button
-                      onClick={() => {
-                        if (translateValues.from === null) return;
-                        setTranslateValues({ from: null });
-                        setCurrentLanguages("Automatyczne wykrywanie", 1);
-                      }}
+                      onClick={() =>
+                        handleSetAutoTranslation(
+                          translateValues,
+                          setCurrentLanguages,
+                          setTranslateValues
+                        )
+                      }
                     >
                       Wykryj język
                     </button>

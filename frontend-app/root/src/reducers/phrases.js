@@ -11,7 +11,7 @@ const initialState = {
   from: null,
   to: "en",
   phrase: "",
-  translation: null,
+  translation: "",
   score: null,
 };
 
