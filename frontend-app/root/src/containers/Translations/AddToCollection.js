@@ -10,7 +10,9 @@ function AddToCollection({ phrases, addTranslation }) {
 
   const setCanAdd = () =>
     set(
-      Object.values(phrases).every((value) => value !== null && value !== "")
+      Object.values({ phrase, translation, from, to }).every(
+        (value) => value !== null && value !== ""
+      )
     );
 
   const handleClick = () => {
@@ -26,6 +28,7 @@ function AddToCollection({ phrases, addTranslation }) {
 
   useEffect(() => {
     setCanAdd();
+    console.log(canAdd);
   }, [phrase, translation, from, to]);
 
   return (

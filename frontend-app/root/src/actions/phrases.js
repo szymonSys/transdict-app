@@ -10,7 +10,10 @@ import {
   SET_PHRASE,
   SET_ALL,
   RESET_PHRASES,
+  SET_LOADING,
 } from "../actions/types";
+
+import { checkType } from "../shared/utils";
 
 import store from "../store";
 
@@ -28,6 +31,7 @@ export const translate = (
     throw new Error("Invalid argument of translate");
 
   try {
+    dispatch({ type: SET_LOADING, payload: true });
     const response = await translateRequest(text, {
       from: fromLanguage,
       to: toLanguage,
@@ -70,7 +74,7 @@ export const translate = (
 
     await dispatch({
       type: TRANSLATE,
-      payload: { from, to, translation, phrase, score },
+      payload: { from, to, translation, phrase, score, isLoading: false },
     });
 
     dispatch(
@@ -84,6 +88,7 @@ export const translate = (
     return getState().phrases;
   } catch (err) {
     console.error(err);
+    dispatch({ type: SET_LOADING, payload: false });
   }
 };
 
@@ -106,3 +111,30 @@ export const resetPhrase = () => (dispatch, getState) => {
   dispatch({ type: RESET_PHRASES });
   return getState().phrases;
 };
+
+export const setPhrases = (props) => (dispatch, getState) => {
+  const phrases = getState().phrases;
+  checkType("object", props) &&
+    props !== null &&
+    dispatch({ type: SET_ALL, payload: setProps(phrases, props) });
+  return getState().phrases;
+};
+
+const checkValue = (object, key) =>
+  key in object &&
+  (checkType("string", object[key]) ||
+    checkType("boolean", object[key]) ||
+    object[key] === null);
+
+const setProps = (prevValues, newValues) => {
+  if (!checkType("object", newValues) || newValues === null)
+    throw new Error("newValues has to be type of object");
+
+  return Object.entries(newValues).reduce(
+    (values, [key, value]) =>
+      checkValue(prevValues, key) ? { ...values, [key]: value } : values,
+    prevValues
+  );
+};
+
+// Object.keys(props).every((key) => checkValue(phrases, key))

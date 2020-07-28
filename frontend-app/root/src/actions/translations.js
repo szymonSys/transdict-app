@@ -101,6 +101,8 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
       payload: Array.isArray(translations) ? [...translations] : [],
     });
 
+    console.log(response);
+
     dispatch(
       createMessage(
         MESSAGE_TYPES.success,

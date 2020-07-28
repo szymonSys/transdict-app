@@ -4,7 +4,7 @@ export default function WithTranslate({ children, callback }) {
   const {
     translateValues,
     isLoading,
-    setState: setTranslateValues,
+    setPhraseProps: setTranslateValues,
     translate,
   } = useTranslate(callback);
   return children({

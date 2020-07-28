@@ -6,7 +6,11 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
 
   const intersectionObserver = useRef();
 
-  const { condition, deps } = executionOptions;
+  const { condition, deps, withPreload } = executionOptions;
+
+  const isPreloadedRef = useRef(!withPreload);
+
+  const { current: isPreloaded } = isPreloadedRef;
 
   const [isLoading, setLoading] = useState(false);
 
@@ -25,23 +29,24 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
   );
 
   const handleScroll = useCallback(
-    (node) => {
+    async (node) => {
       if (!checkType("function", actionCallback)) {
         throw new Error("Invalid argument");
       }
 
       intersectionObserver.current && intersectionObserver.current.disconnect();
 
-      intersectionObserver.current = new IntersectionObserver(
-        async ([entrie]) => {
-          if (entrie.intersectionRatio > 0 && !!shouldExecute) {
-            setLoading(true);
-            actionCallback();
-            // setTimeout(actionCallback, 300);
-            // await Promise.resolve().then(() => setTimeout(actionCallback, 300));
-          }
+      if (!isPreloaded) {
+        await actionCallback();
+        isPreloadedRef.current = true;
+      }
+
+      intersectionObserver.current = new IntersectionObserver(([entrie]) => {
+        if (entrie.intersectionRatio > 0 && !!shouldExecute) {
+          setLoading(true);
+          actionCallback();
         }
-      );
+      });
 
       if (node && shouldExecute) intersectionObserver.current.observe(node);
     },

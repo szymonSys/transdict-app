@@ -96,6 +96,7 @@ function CollectionWrapper({
         callback={() => getTranslations(collectionId)}
         executionOptions={{
           condition: checkIfFetchedTranslations,
+          withPreload: true,
           deps: [translations.length, translationsQuantity],
         }}
       >

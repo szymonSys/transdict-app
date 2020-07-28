@@ -1,39 +1,41 @@
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { checkType } from "../utils";
 import usePrevious from "../hooks/usePrevious";
-import { translate as translateAction } from "../../actions/phrases";
+import {
+  translate as translateAction,
+  setPhrases as setPhrasesAction,
+} from "../../actions/phrases";
 import store from "../../store";
 
-const { score, ...initialTranslateValues } = store.getState().phrases;
+export default function useTranslate(callback = null) {
+  const phrases = store.getState().phrases;
 
-export default function useTranslate(
-  callback = null,
-  initialValues = initialTranslateValues
-) {
-  const [translateValues, setTranslateValues] = useState(
-    checkInitialValues(initialValues)
-  );
-
-  const [isLoading, setLoading] = useState(false);
-
-  const prevState = usePrevious({ ...translateValues });
-
-  const { phrase, translation, from, to } = translateValues;
-
-  const setState = (newState) =>
-    setTranslateValues((prevState) => setValues(prevState, newState));
+  const {
+    phrase,
+    translation,
+    from,
+    to,
+    isLoading,
+    autoTranslation,
+    score,
+  } = phrases;
 
   const timeoutIdRef = useRef();
 
+  const prevPhrases = usePrevious({ ...phrases });
+
+  const setPhraseProps = async (newState) => {
+    await store.dispatch(setPhrasesAction(newState));
+  };
+
   const translate = async () => {
-    const [translateProps, isValid] = valid(translateValues);
+    const [translateProps, isValid] = valid(phrases);
     if (isValid) {
       const {
         phrase: text,
         from: fromLanguage,
         to: toLanguage,
       } = translateProps;
-      setLoading(true);
       await store.dispatch(
         translateAction(text, {
           fromLanguage,
@@ -41,8 +43,6 @@ export default function useTranslate(
           toScript: null,
         })
       );
-      const { from, ...restValues } = store.getState().phrases;
-      setState(restValues);
       checkType("function", callback) && callback();
     } else {
       console.log("translate props is not valid");
@@ -50,51 +50,46 @@ export default function useTranslate(
   };
 
   useEffect(() => {
-    isLoading && setLoading(false);
-  }, [isLoading]);
+    if (
+      !isLoading &&
+      checkType("string", translation, phrase) &&
+      (translation === prevPhrases?.translation ||
+        prevPhrases?.translation === phrase) &&
+      (!(prevPhrases.autoTranslation && !autoTranslation) ||
+        prevPhrases?.from === from) &&
+      prevPhrases?.score === score
+    ) {
+      console.log("from, to");
+      translate();
+    }
+  }, [from, to]);
 
   useEffect(() => {
-    if (
-      (prevState?.to !== to || prevState?.from !== from) &&
-      checkType("string", translation, phrase)
-    ) {
-      translate();
-    } else if (prevState?.phrase !== phrase) {
+    if ((!isLoading && prevPhrases?.from === from) || prevPhrases?.to === to) {
       timeoutIdRef.current && clearTimeout(timeoutIdRef.current);
-      if (to && phrase !== initialTranslateValues.phrase) {
-        timeoutIdRef.current = setTimeout(translate, 2000);
+      if (to && phrase !== prevPhrases?.phrase) {
+        console.log("phrase");
+        timeoutIdRef.current = setTimeout(translate, 1000);
       }
     }
-  }, [from, to, phrase]);
+  }, [phrase]);
 
-  return { translateValues, isLoading, setState, translate };
+  return {
+    translateValues: store.getState().phrases,
+    isLoading,
+    setPhraseProps,
+    translate,
+  };
 }
-
-const checkValue = (object, key) =>
-  key in object && (checkType("string", object[key]) || object[key] === null);
-
-const checkInitialValues = (values) =>
-  checkType("object", values) &&
-  values !== null &&
-  Object.keys(initialTranslateValues).every((key) => checkValue(values, key))
-    ? values
-    : { ...initialTranslateValues };
-
-const setValues = (prevValues, newValues) => {
-  if (!checkType("object", newValues) || newValues === null)
-    throw new Error("newValues has to be type of object");
-
-  return Object.entries(newValues).reduce(
-    (values, [key, value]) =>
-      checkValue(prevValues, key) ? { ...values, [key]: value } : values,
-    prevValues
-  );
-};
 
 const valid = (props) => {
   const entries = Object.entries(props).reduce(
     (validatedProps, [key, value]) =>
-      key === "translation" || (value === null && key !== "from")
+      key === "translation" ||
+      key === "score" ||
+      key === "autoTranslation" ||
+      key === "isLoading" ||
+      (value === null && key !== "from")
         ? validatedProps
         : [...validatedProps, [key, value]],
     []

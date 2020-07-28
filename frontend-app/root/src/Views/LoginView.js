@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, Redirect, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LoginWithFormHandling from "../containers/Login/LoginWithFormHandling";
 import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
 import MainTranslatorWrapper from "../components/Translator/MainTranslatorWrapper";

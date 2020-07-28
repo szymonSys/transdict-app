@@ -12,22 +12,29 @@ function TranslatorWithSwitchLanguages({
 }) {
   const handleChange = (translateValues, setTranslateValues, event) => {
     const newTranslateValues = { phrase: event.target.value };
-    if (
-      event.target.value.length === 0 &&
-      translateValues.translation !== null
-    ) {
-      newTranslateValues.translation = null;
+    if (!event.target.value?.length && translateValues.translation?.length) {
+      newTranslateValues.translation = "";
+    }
+    if (translateValues.autoTranslation && translateValues.from !== null) {
+      newTranslateValues.from = null;
+      newTranslateValues.autoTranslation = false;
     }
     setTranslateValues(newTranslateValues);
   };
 
-  const handleReverse = (
+  const handleReverse = ({
     translateValues,
     reverseCurrentLanguages,
-    setTranslateValues
-  ) => {
+    setCurrentLanguages,
+    setTranslateValues,
+  }) => {
     if (translateValues.from === null) return;
-    reverseCurrentLanguages();
+    translateValues.autoTranslation
+      ? setCurrentLanguages([
+          languages.languages.get(translateValues.to)?.name,
+          languages.languages.get(translateValues.from)?.name,
+        ])
+      : reverseCurrentLanguages();
     setTranslateValues({
       from: translateValues.to,
       to: translateValues.from,
@@ -36,24 +43,34 @@ function TranslatorWithSwitchLanguages({
     });
   };
 
-  const handleSetAutoTranslation = (
+  const handleSetAutoTranslation = ({
     translateValues,
     setCurrentLanguages,
-    setTranslateValues
-  ) => {
-    if (translateValues.from === null) return;
-    setTranslateValues({ from: null });
-    setCurrentLanguages("Automatyczne wykrywanie", 1);
+    setTranslateValues,
+  }) => {
+    console.log(translateValues);
+    if (
+      translateValues.from === null ||
+      translateValues.autoTranslation === true
+    )
+      return;
+    setTranslateValues({ from: null, autoTranslation: false });
+    setCurrentLanguages(`Automatyczne wykrywanie`, 1);
   };
 
-  const setCurrentLanguagesOutput = (currentLanguages, translateValues) => [
-    `${currentLanguages[0]} ${
-      !translateValues.from && phrase.from && translateValues.translation
-        ? " [" + languages.languages.get(phrase.from)?.name + "] "
-        : ""
-    }`,
-    `${currentLanguages[1]}`,
-  ];
+  const setCurrentLanguagesOutput = (currentLanguages, translateValues) => {
+    const language = languages.languages.get(translateValues.from)?.name;
+    return [
+      `${currentLanguages[0]} ${
+        translateValues.autoTranslation &&
+        translateValues.translation &&
+        language
+          ? " [" + language + "] "
+          : ""
+      }`,
+      `${currentLanguages[1]}`,
+    ];
+  };
 
   return (
     <WithTranslate callback={() => console.log("translation success!")}>
@@ -76,18 +93,19 @@ function TranslatorWithSwitchLanguages({
                   handleChange(translateValues, setTranslateValues, event)
                 }
                 handleReverse={() =>
-                  handleReverse(
+                  handleReverse({
                     translateValues,
                     reverseCurrentLanguages,
-                    setTranslateValues
-                  )
+                    setCurrentLanguages,
+                    setTranslateValues,
+                  })
                 }
                 handleSetAutoTranslation={() =>
-                  handleSetAutoTranslation(
+                  handleSetAutoTranslation({
                     translateValues,
                     setCurrentLanguages,
-                    setTranslateValues
-                  )
+                    setTranslateValues,
+                  })
                 }
                 setCurrentLanguagesOutput={() =>
                   setCurrentLanguagesOutput(currentLanguages, translateValues)

@@ -391,7 +391,7 @@ def get_translations_with_limit_and_offset(current_user):
     for translation in translations:
       trans = {}
       trans['id'] = translation[0].id
-      trans['primatyLanguage'] = translation[0].primaryLanguage
+      trans['primaryLanguage'] = translation[0].primaryLanguage
       trans['secondaryLanguage'] = translation[0].secondaryLanguage
       trans['primaryPhrase'] = translation[0].primaryPhrase
       trans['secondaryPhrase'] = translation[0].secondaryPhrase
