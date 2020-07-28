@@ -3,7 +3,7 @@ import CollectionWrapper from "../containers/Collection/CollectionWrapper";
 import TranslationsSorting from "../containers/Translations/TranslationsSorting";
 import Sorting from "../shared/containers/Sorting";
 import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
-import MainTranslatorWrapper from "../components/Translator/MainTranslatorWrapper";
+import TranslatorWrapperWithAdding from "../components/Translator/TranslatorWrapperWithAdding";
 import AddToCollection from "../containers/Translations/AddToCollection.js";
 
 import { useParams, useRouteMatch, Link } from "react-router-dom";
@@ -20,8 +20,8 @@ export default function CollectionView() {
       <Link to={`${url}/flashcards`}>{"learn ->"}</Link>
 
       <TranslatorWithSwitchLanguages
-        Translator={MainTranslatorWrapper}
-        AddToCollection={AddToCollection}
+        Translator={TranslatorWrapperWithAdding}
+        // AddToCollection={AddToCollection}
       />
 
       <TranslationsSorting>

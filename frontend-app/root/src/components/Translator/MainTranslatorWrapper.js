@@ -2,7 +2,6 @@ import React from "react";
 import LanguagesWithTwoLists from "../../components/Languages/LanguagesWithTwoLists";
 
 export default function MainTranslatorWrapper({
-  children,
   translateValues,
   isLoading,
   languages,
@@ -23,13 +22,16 @@ export default function MainTranslatorWrapper({
       <h5>{languageOutputTo}</h5>
       <textarea
         disabled={true}
-        value={
-          isLoading
-            ? "Loading..."
-            : translateValues.phrase
-            ? translateValues.translation
-            : ""
-        }
+        value={`${translateValues.phrase ? translateValues.translation : ""}${
+          isLoading ? "..." : ""
+        }`}
+        // value={
+        //   isLoading
+        //     ? "Loading..."
+        //     : translateValues.phrase
+        //     ? translateValues.translation
+        //     : ""
+        // }
       />
 
       {AddToCollection?.$$typeof && <AddToCollection />}

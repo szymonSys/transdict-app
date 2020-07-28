@@ -81,37 +81,35 @@ function TranslatorWithSwitchLanguages({
             reverse: reverseCurrentLanguages,
             setSwitchables: setCurrentLanguages,
           }) => (
-            <div>
-              <Translator
-                AddToCollection={AddToCollection}
-                translateValues={translateValues}
-                isLoading={isLoading}
-                languages={languages}
-                setTranslateValues={setTranslateValues}
-                setCurrentLanguages={setCurrentLanguages}
-                handleChange={(event) =>
-                  handleChange(translateValues, setTranslateValues, event)
-                }
-                handleReverse={() =>
-                  handleReverse({
-                    translateValues,
-                    reverseCurrentLanguages,
-                    setCurrentLanguages,
-                    setTranslateValues,
-                  })
-                }
-                handleSetAutoTranslation={() =>
-                  handleSetAutoTranslation({
-                    translateValues,
-                    setCurrentLanguages,
-                    setTranslateValues,
-                  })
-                }
-                setCurrentLanguagesOutput={() =>
-                  setCurrentLanguagesOutput(currentLanguages, translateValues)
-                }
-              />
-            </div>
+            <Translator
+              AddToCollection={AddToCollection}
+              translateValues={translateValues}
+              isLoading={isLoading}
+              languages={languages}
+              setTranslateValues={setTranslateValues}
+              setCurrentLanguages={setCurrentLanguages}
+              handleChange={(event) =>
+                handleChange(translateValues, setTranslateValues, event)
+              }
+              handleReverse={() =>
+                handleReverse({
+                  translateValues,
+                  reverseCurrentLanguages,
+                  setCurrentLanguages,
+                  setTranslateValues,
+                })
+              }
+              handleSetAutoTranslation={() =>
+                handleSetAutoTranslation({
+                  translateValues,
+                  setCurrentLanguages,
+                  setTranslateValues,
+                })
+              }
+              setCurrentLanguagesOutput={() =>
+                setCurrentLanguagesOutput(currentLanguages, translateValues)
+              }
+            />
           )}
         </WithSwitch>
       )}

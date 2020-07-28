@@ -20,9 +20,9 @@ export default function useTranslate(callback = null) {
     score,
   } = phrases;
 
-  const timeoutIdRef = useRef();
-
   const prevPhrases = usePrevious({ ...phrases });
+
+  const timeoutIdRef = useRef();
 
   const setPhraseProps = async (newState) => {
     await store.dispatch(setPhrasesAction(newState));
@@ -30,12 +30,14 @@ export default function useTranslate(callback = null) {
 
   const translate = async () => {
     const [translateProps, isValid] = valid(phrases);
+
     if (isValid) {
       const {
         phrase: text,
         from: fromLanguage,
         to: toLanguage,
       } = translateProps;
+
       await store.dispatch(
         translateAction(text, {
           fromLanguage,
@@ -43,6 +45,7 @@ export default function useTranslate(callback = null) {
           toScript: null,
         })
       );
+
       checkType("function", callback) && callback();
     } else {
       console.log("translate props is not valid");
@@ -59,7 +62,6 @@ export default function useTranslate(callback = null) {
         prevPhrases?.from === from) &&
       prevPhrases?.score === score
     ) {
-      console.log("from, to");
       translate();
     }
   }, [from, to]);
@@ -67,8 +69,8 @@ export default function useTranslate(callback = null) {
   useEffect(() => {
     if ((!isLoading && prevPhrases?.from === from) || prevPhrases?.to === to) {
       timeoutIdRef.current && clearTimeout(timeoutIdRef.current);
+
       if (to && phrase !== prevPhrases?.phrase) {
-        console.log("phrase");
         timeoutIdRef.current = setTimeout(translate, 1000);
       }
     }

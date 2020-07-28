@@ -22,6 +22,7 @@ import {
   resetTranslationsStore,
   clearTranslations,
 } from "../../actions/translations";
+import { translate } from "../../services/text-translate-API/requests";
 
 function CollectionWrapper({
   getTranslations,
@@ -51,8 +52,9 @@ function CollectionWrapper({
     [messages.translationsMsg?.text]
   );
 
-  const checkIfFetchedTranslations = () =>
-    !translations.length || translations.length < translationsQuantity;
+  const checkIfFetchedTranslations = () => {
+    return translations.length < translationsQuantity;
+  };
 
   const handleClick = (event) => {
     const { translationId, action } = event?.target?.dataset;
@@ -83,26 +85,32 @@ function CollectionWrapper({
 
   return (
     <div>
-      <p>{message?.text}</p>
       {checkType("number", learnedQuantity, translationsQuantity) &&
         !isNaN(learnedQuantity) &&
         !isNaN(translationsQuantity) && (
           <p>
             {learnedQuantity}/{translationsQuantity} ---{" "}
-            {`${((learnedQuantity / translationsQuantity) * 100).toFixed()}%`}
+            {`${
+              translationsQuantity
+                ? ((learnedQuantity / translationsQuantity) * 100).toFixed()
+                : 0
+            }%`}
           </p>
         )}
       <WithInfiniteScroll
         callback={() => getTranslations(collectionId)}
         executionOptions={{
           condition: checkIfFetchedTranslations,
-          withPreload: true,
+          withPreload: !translations.length ? true : false,
           deps: [translations.length, translationsQuantity],
         }}
       >
         {(ref, isLoading) => (
           <div>
-            <div onClick={handleClick} style={{ marginBottom: 80 }}>
+            <div
+              onClick={handleClick}
+              style={{ marginBottom: 80, minHeight: isLoading ? "100vh" : 0 }}
+            >
               {" "}
               {translations.map((translation) => (
                 <Translation key={translation.id} translation={translation} />

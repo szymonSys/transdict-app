@@ -28,7 +28,6 @@ function AddToCollection({ phrases, addTranslation }) {
 
   useEffect(() => {
     setCanAdd();
-    console.log(canAdd);
   }, [phrase, translation, from, to]);
 
   return (

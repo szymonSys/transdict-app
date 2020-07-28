@@ -1,6 +1,7 @@
 import React from "react";
 
 import LanguagesWithTwoLists from "../../components/Languages/LanguagesWithTwoLists";
+import AddToCollection from "../../containers/Translations/AddToCollection";
 
 export default function TranslatorWrapperWithAdding({
   children,
@@ -28,7 +29,7 @@ export default function TranslatorWrapperWithAdding({
         disabled="disabled"
         value={isLoading ? "Loading..." : phrase ? translation : ""}
       />
-
+      <AddToCollection />
       <h2>Languages</h2>
       <LanguagesWithTwoLists
         languages={languages}

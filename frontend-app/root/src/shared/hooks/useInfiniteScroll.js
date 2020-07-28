@@ -8,25 +8,19 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
 
   const { condition, deps, withPreload } = executionOptions;
 
-  const isPreloadedRef = useRef(!withPreload);
-
-  const { current: isPreloaded } = isPreloadedRef;
-
   const [isLoading, setLoading] = useState(false);
+
+  const [isPreloaded, setIsPreloaded] = useState(!withPreload);
 
   const [shouldExecute, setShouldExecute] = useState(
     checkType("function", condition) ? condition() : !!condition
   );
 
-  useEffect(
-    () => {
-      setShouldExecute(
-        checkType("function", condition) ? condition() : !!condition
-      );
-      isLoading && setLoading(false);
-    },
-    Array.isArray(deps) ? deps : []
-  );
+  const handlePreload = useCallback(() => {
+    setLoading(true);
+    actionCallback();
+    setIsPreloaded(true);
+  }, []);
 
   const handleScroll = useCallback(
     async (node) => {
@@ -35,11 +29,6 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
       }
 
       intersectionObserver.current && intersectionObserver.current.disconnect();
-
-      if (!isPreloaded) {
-        await actionCallback();
-        isPreloadedRef.current = true;
-      }
 
       intersectionObserver.current = new IntersectionObserver(([entrie]) => {
         if (entrie.intersectionRatio > 0 && !!shouldExecute) {
@@ -53,11 +42,26 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
     [shouldExecute]
   );
 
+  useEffect(
+    () => {
+      setShouldExecute(
+        checkType("function", condition) ? condition() : !!condition
+      );
+      isLoading && setLoading(false);
+    },
+
+    Array.isArray(deps) ? deps : []
+  );
+
   useEffect(() => {
-    handleScroll(ref.current);
+    setIsPreloaded(!withPreload);
+  }, [withPreload]);
+
+  useEffect(() => {
+    !isPreloaded ? handlePreload() : handleScroll(ref.current);
     return () =>
       intersectionObserver.current && intersectionObserver.current.disconnect();
-  }, [shouldExecute]);
+  }, [shouldExecute, isPreloaded]);
 
   return [ref, isLoading];
 };
