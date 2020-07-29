@@ -111,7 +111,7 @@ export const getTranslations = (collectionId) => async (dispatch, getState) => {
 
     return getState().translations.translations;
   } catch (err) {
-    console.log(err);
+    console.error(err);
 
     return;
   }

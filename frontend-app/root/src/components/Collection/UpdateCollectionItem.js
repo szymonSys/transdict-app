@@ -7,8 +7,8 @@ export default function UpdateCollectionItem({
 }) {
   return (
     <li>
-      <span>{collectionName}</span>
       <button ref={btnRef}>{actionType}</button>
+      <span>{collectionName}</span>
     </li>
   );
 }

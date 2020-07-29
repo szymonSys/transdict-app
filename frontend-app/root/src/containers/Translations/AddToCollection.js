@@ -16,7 +16,6 @@ function AddToCollection({ phrases, addTranslation }) {
     );
 
   const handleClick = () => {
-    console.log(collectionId, phrase, translation, from, to);
     canAdd &&
       addTranslation(parseInt(collectionId), {
         primaryPhrase: phrase,

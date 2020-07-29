@@ -37,8 +37,6 @@ function UpdateCollectionsSelection({
 
     let actionIsExecuted = false;
 
-    console.log(actionType, translationId, collectionId);
-
     if (!checkType("string", collectionId, actionType)) return;
 
     const collectionIdInt = parseInt(collectionId);
