@@ -24,7 +24,11 @@ export default function CollectionItem({ collection, deleteBtnRef, url }) {
         !isNaN(translationsQuantity) && (
           <p>
             {learnedQuantity}/{translationsQuantity} ---{" "}
-            {`${((learnedQuantity / translationsQuantity) * 100).toFixed()}%`}{" "}
+            {`${
+              translationsQuantity
+                ? ((learnedQuantity / translationsQuantity) * 100).toFixed()
+                : 0
+            }%`}{" "}
             <Link to={`${url}/flashcards`}>{"learn ->"}</Link>
           </p>
         )}

@@ -349,7 +349,56 @@ def get_collections_with_limit_and_offset(current_user):
   return jsonify({'collections': response_collections, 'collectionsQuantity': collections_quantity, 'limit': int(limit), 'offset': int(offset), 'contentIsSent': True})
 
 
+@app.route("/user/collections/with-translation", methods=['POST'])
+@token_required
+def get_collections_with_forward_translation_ids(current_user):
+  if not check_session():
 
+    return jsonify({'message': 'You are not logged in!', 'isLoggedIn': False})
+
+  request_data = request.get_json(silent=True, force=True)
+
+  translation_primary_language = request_data.get('primaryLanguage')
+  translation_secondary_language = request_data.get('secondaryLanguage')
+  translation_primary_phrase = request_data.get('primaryPhrase')
+  translation_secondary_phrase = request_data.get('secondaryPhrase')
+  
+  if translation_primary_phrase == None or translation_secondary_phrase == None or translation_primary_language == None or translation_secondary_language == None:
+
+    return jsonify({'message': 'Invalid request arguments', 'contentIsSent': False})
+
+  order_by_options = {"name": Collection.name, "translationsQuantity": 'total', "learnedQuantity": 'learned',"createdAt": Collection.createdAt, "updatedAt": Collection.updatedAt, "id": Collection.id,}
+
+
+  collections_quantity = db.session.query(Collection.id).filter(db.and_(Collection.userId==current_user.id)).count()
+
+  collections_with_translation = db.session.query(Collection.id, Translation.id, TranslationStatus ).join(TranslationStatus, Translation.id == TranslationStatus.translationId).join(Collection, Collection.id==TranslationStatus.collectionId).filter(db.and_(Translation.primaryPhrase==translation_primary_phrase, Translation.secondaryPhrase==translation_secondary_phrase, Translation.primaryLanguage==translation_primary_language,Translation.secondaryLanguage==translation_secondary_language, Collection.userId==current_user.id)).group_by(Collection).all()
+
+  # collections_without_translation = db.session.query(Collection).filter(db.and_(Collection.userId==current_user.id)).group_by(Collection).all()
+
+
+  response_collections = []
+  collections_with_translation_ids = {}
+
+  for collection_data in collections_with_translation:
+    collections_with_translation_ids[str(collection_data[0])] = collection_data[1]
+
+  # for collection_data in collections_without_translation:
+  #   collection = {}
+  #   collection['name'] = collection_data.name
+  #   collection['id'] = collection_data.id
+  #   collection['createdAt'] = collection_data.createdAt
+  #   collection['updatedAt'] = collection_data.updatedAt
+  #   if collection_data.id in collections_with_translation_ids:
+  #     collection['hasForwardTranslation'] = True
+  #   else:
+  #     collection['hasForwardTranslation'] = False
+
+  #   response_collections.append(collection)
+
+  return jsonify({'ids': collections_with_translation_ids, 'collectionsQuantity': collections_quantity, 'contentIsSent': True})
+
+  # return jsonify({'collections': response_collections, 'collectionsQuantity': collections_quantity, 'contentIsSent': True})
 
 
 @app.route("/user/collection/translations", methods=['GET'])

@@ -40,7 +40,7 @@ function CollectionsList({
   } = collectionsObject;
 
   const checkIfFetchedCollections = () =>
-    !collections.length || collections.length < collectionsQuantity;
+    collections.length < collectionsQuantity;
 
   const handleClick = (event) => {
     const { collectionId, action } = event?.target?.dataset;
@@ -63,12 +63,16 @@ function CollectionsList({
         callback={() => getUserCollections()}
         executionOptions={{
           condition: checkIfFetchedCollections,
+          withPreload: !collections.length ? true : false,
           deps: [collections.length, collectionsQuantity],
         }}
       >
         {(ref, isLoading) => (
           <div>
-            <div onClick={handleClick} style={{ marginBottom: 80 }}>
+            <div
+              onClick={handleClick}
+              style={{ marginBottom: 80, minHeight: isLoading ? 1000 : 0 }}
+            >
               {collections.map((collection) => (
                 <Collection
                   key={collection.id}

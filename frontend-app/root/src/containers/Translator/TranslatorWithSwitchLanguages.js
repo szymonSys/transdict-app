@@ -1,5 +1,4 @@
 import React from "react";
-// import MainTranslatorWrapper from "../../components/Translations/MainTranslatorWrapper";
 import WithTranslate from "../../shared/containers/WithTranslate";
 import WithSwitch from "../../shared/containers/WithSwitch";
 import { connect } from "react-redux";
@@ -48,7 +47,6 @@ function TranslatorWithSwitchLanguages({
     setCurrentLanguages,
     setTranslateValues,
   }) => {
-    console.log(translateValues);
     if (
       translateValues.from === null ||
       translateValues.autoTranslation === true

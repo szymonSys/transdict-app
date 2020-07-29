@@ -1,5 +1,6 @@
 import React from "react";
 import LanguagesWithTwoLists from "../../components/Languages/LanguagesWithTwoLists";
+import UpdateCollectionsSelection from "../../containers/Collection/UpdateCollectionsSelection";
 
 export default function MainTranslatorWrapper({
   translateValues,
@@ -11,7 +12,6 @@ export default function MainTranslatorWrapper({
   setCurrentLanguagesOutput,
   setCurrentLanguages,
   setTranslateValues,
-  AddToCollection,
 }) {
   const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
   return (
@@ -25,16 +25,8 @@ export default function MainTranslatorWrapper({
         value={`${translateValues.phrase ? translateValues.translation : ""}${
           isLoading ? "..." : ""
         }`}
-        // value={
-        //   isLoading
-        //     ? "Loading..."
-        //     : translateValues.phrase
-        //     ? translateValues.translation
-        //     : ""
-        // }
       />
-
-      {AddToCollection?.$$typeof && <AddToCollection />}
+      <UpdateCollectionsSelection />
       <h2>Languages</h2>
       <LanguagesWithTwoLists
         languages={languages}

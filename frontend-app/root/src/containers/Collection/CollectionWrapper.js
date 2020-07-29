@@ -52,9 +52,8 @@ function CollectionWrapper({
     [messages.translationsMsg?.text]
   );
 
-  const checkIfFetchedTranslations = () => {
-    return translations.length < translationsQuantity;
-  };
+  const checkIfFetchedTranslations = () =>
+    translations.length < translationsQuantity;
 
   const handleClick = (event) => {
     const { translationId, action } = event?.target?.dataset;

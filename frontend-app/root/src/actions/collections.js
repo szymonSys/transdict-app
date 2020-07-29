@@ -5,6 +5,7 @@ import {
   addCollection as addCollectionRequest,
   deleteCollection as deleteCollectionRequest,
   getUserCollections as getUserCollectionsRequest,
+  getCollectionsWithForwardTranslationIds as getCollectionsWithForwardTranslationIdsRequest,
 } from "../services/transdict-API/requests";
 
 import {
@@ -16,6 +17,8 @@ import {
   DELETE_COLLECTION,
   ADD_COLLECTION,
   CLEAR_COLLECTIONS,
+  SET_IDS_WITH_FORWARD_TRANSLATION,
+  CLEAR_IDS_WITH_FORWARD_TRANSLATION,
 } from "./types";
 
 import {
@@ -39,6 +42,53 @@ export const getUserCollections = () => async (dispatch, getState) => {
     sortBy,
     sortDirection,
   });
+};
+
+export const clearCollectionsWithForwardTranslationIds = () => (dispatch) =>
+  dispatch({ type: CLEAR_IDS_WITH_FORWARD_TRANSLATION });
+
+export const getCollectionsWithForwardTranslationIds = () => async (
+  dispatch,
+  getState
+) => {
+  const {
+    auth: { token },
+    phrases: { score, isLoading, autoTranslation, ...currentTranslation },
+  } = getState();
+
+  const { phrase, from, to, translation } = currentTranslation;
+
+  try {
+    if (
+      Object.values(currentTranslation).some(
+        (value) => !checkType("string", value) || value === ""
+      )
+    )
+      throw new Error("Invalid argument of translation props");
+
+    const response = await getCollectionsWithForwardTranslationIdsRequest(
+      token,
+      {
+        primaryLanguage: from,
+        secondaryLanguage: to,
+        primaryPhrase: phrase,
+        secondaryPhrase: translation,
+      }
+    );
+
+    const { contentIsSent, ...collectionsWithTranslationData } = response;
+
+    if (!contentIsSent) {
+      throw new Error("Collections ids has not been sent!");
+    } else {
+      await dispatch({
+        type: SET_IDS_WITH_FORWARD_TRANSLATION,
+        payload: collectionsWithTranslationData,
+      });
+    }
+  } catch (err) {
+    console.error(err);
+  }
 };
 
 export const addCollection = (collectionName) => async (dispatch, getState) => {
@@ -74,6 +124,7 @@ export const addCollection = (collectionName) => async (dispatch, getState) => {
           `Collection ${newCollection.name} has been added`
         )
       );
+      return getState().collections.collections;
     }
   } catch (err) {
     console.error(err);
@@ -128,17 +179,10 @@ export const toggleOrder = () => async (dispatch, getState) => {
     collections: { sortDirection },
   } = getState();
 
-  await dispatch({
+  return dispatch({
     type: SET_COLLECTIONS_ORDER,
     payload: sortDirection === ASC_ORDER ? DESC_ORDER : ASC_ORDER,
   });
-  dispatch(
-    createMessage(
-      MESSAGE_TYPES.info,
-      "collectionsOrderMsg",
-      `Fetching collections order is ${getState().collections.sortDirection}`
-    )
-  );
 };
 
 export const setLimit = (limit) => async (dispatch) => {

@@ -4,8 +4,6 @@ import TranslationsSorting from "../containers/Translations/TranslationsSorting"
 import Sorting from "../shared/containers/Sorting";
 import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
 import TranslatorWrapperWithAdding from "../components/Translator/TranslatorWrapperWithAdding";
-import AddToCollection from "../containers/Translations/AddToCollection.js";
-
 import { useParams, useRouteMatch, Link } from "react-router-dom";
 
 export default function CollectionView() {
@@ -17,12 +15,10 @@ export default function CollectionView() {
       <p>Collection menu component</p>
       <p>add translate and add new phrase component</p>
       <h1>{collectionName}</h1>
+
       <Link to={`${url}/flashcards`}>{"learn ->"}</Link>
 
-      <TranslatorWithSwitchLanguages
-        Translator={TranslatorWrapperWithAdding}
-        // AddToCollection={AddToCollection}
-      />
+      <TranslatorWithSwitchLanguages Translator={TranslatorWrapperWithAdding} />
 
       <TranslationsSorting>
         {({ setSortBy, toggleOrder, sortBy, sortingOptions }) => (

@@ -22,6 +22,7 @@ import {
   getNewCollectionURL,
   getUserURL,
   getAllTranslationsIdsURL,
+  getCollectionsWithForwardTranslationIdsURL,
 } from "./urls";
 
 const { SORT_DEFAULT: SORT_TRANSLATIONS_DEFAULT } = TRANSLATIONS_SORT_OPTIONS;
@@ -91,6 +92,27 @@ export function deleteCollection(token = null, { collectionId = null } = {}) {
   return handleRequest(getDeleteCollectionURL({ collectionId }), {
     method: "DELETE",
     token,
+  });
+}
+
+export function getCollectionsWithForwardTranslationIds(
+  token = null,
+  {
+    primaryPhrase = null,
+    secondaryPhrase = null,
+    primaryLanguage = null,
+    secondaryLanguage = null,
+  } = {}
+) {
+  return handleRequest(getCollectionsWithForwardTranslationIdsURL(), {
+    token,
+    method: "POST",
+    requestData: {
+      primaryPhrase,
+      primaryLanguage,
+      secondaryPhrase,
+      secondaryLanguage,
+    },
   });
 }
 

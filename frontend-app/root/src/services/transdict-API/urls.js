@@ -22,6 +22,9 @@ export const getUserURL = () => "/user";
 
 export const getNewCollectionURL = () => "/user/collections/new";
 
+export const getCollectionsWithForwardTranslationIdsURL = () =>
+  "/user/collections/with-translation";
+
 export const getUpdateCollectionsURL = (
   params = { collectionId: null, translationId: null, action: null }
 ) => setToPattern("/user/collections/update", setUrlParams({ ...params }));

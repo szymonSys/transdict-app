@@ -7,6 +7,8 @@ import {
   SET_COLLECTIONS_ORDER,
   DELETE_COLLECTION,
   ADD_COLLECTION,
+  CLEAR_IDS_WITH_FORWARD_TRANSLATION,
+  SET_IDS_WITH_FORWARD_TRANSLATION,
 } from "../actions/types";
 
 import {
@@ -18,6 +20,10 @@ import {
 const { SORT_DEFAULT } = COLLECTIONS_SORT_OPTIONS;
 
 const initialState = {
+  collectionsWithTranslationData: {
+    isSent: false,
+    ids: {},
+  },
   collections: [],
   collectionsQuantity: null,
   sortBy: SORT_DEFAULT,
@@ -60,6 +66,16 @@ export default function (state = { ...initialState }, action) {
       return { ...state, sortDirection: payload };
     case RESET_COLLECTIONS_STORE:
       return { ...initialState };
+    case SET_IDS_WITH_FORWARD_TRANSLATION:
+      return {
+        ...state,
+        collectionsWithTranslationData: { isSent: true, ids: payload.ids },
+      };
+    case CLEAR_IDS_WITH_FORWARD_TRANSLATION:
+      return {
+        ...state,
+        collectionsWithTranslationData: { isSent: false, ids: {} },
+      };
     default:
       return state;
   }
