@@ -4,12 +4,11 @@ import usePrevious from "../hooks/usePrevious";
 import {
   translate as translateAction,
   setPhrases as setPhrasesAction,
+  resetPhrase as resetPhraseAction,
 } from "../../actions/phrases";
 import store from "../../store";
 
-export default function useTranslate(callback = null) {
-  const phrases = store.getState().phrases;
-
+export default function useTranslate(phrases, callback = null) {
   const {
     phrase,
     translation,
@@ -77,7 +76,7 @@ export default function useTranslate(callback = null) {
   }, [phrase]);
 
   return {
-    translateValues: store.getState().phrases,
+    translateValues: phrases,
     isLoading,
     setPhraseProps,
     translate,

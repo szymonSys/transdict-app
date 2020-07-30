@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import { useState, useCallback } from "react";
 import { useHistory } from "react-router-dom";
 
 export default function useRedirection(defaultPath = "/") {

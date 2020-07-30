@@ -9,12 +9,13 @@ import {
   clearCollectionsWithForwardTranslationIds,
 } from "../../actions/collections";
 import { addTranslation, deleteTranslation } from "../../actions/translations";
+import AddCollection from "../../containers/Collection/AddCollection";
 
 function UpdateCollectionsSelection({
   collections,
+  isAuthenticated,
   collectionsQuantity,
   collectionsIdsWithTranslationMap,
-  idsListIsSent,
   translation,
   getCollections,
   getCollectionsIdsWithTranslation,
@@ -59,6 +60,8 @@ function UpdateCollectionsSelection({
       (value) => checkType("string", value) && value
     );
 
+  const checkCanOpen = () => isAuthenticated && canOpen;
+
   useEffect(() => {
     isVisible && getCollectionsIdsWithTranslation();
   }, [isVisible]);
@@ -79,7 +82,7 @@ function UpdateCollectionsSelection({
   return (
     <div>
       {!isVisible && (
-        <button disabled={!canOpen} onClick={() => setVisibility(true)}>
+        <button disabled={!checkCanOpen()} onClick={() => setVisibility(true)}>
           add do collection
         </button>
       )}
@@ -102,6 +105,7 @@ function UpdateCollectionsSelection({
                 overflow: "scroll",
               }}
             >
+              <AddCollection />
               <button onClick={() => setVisibility(false)}>close</button>
               <ul
                 onClick={handleClick}
@@ -121,9 +125,7 @@ function UpdateCollectionsSelection({
                   );
                 })}
               </ul>
-              <div style={{ height: 1 }} ref={ref}>
-                CZEŚĆ
-              </div>
+              <div style={{ height: 1 }} ref={ref} />
               <h2>{isLoading ? "..." : ""}</h2>
             </div>
           )}
@@ -143,6 +145,7 @@ const mapStateToProps = (state) => {
         isSent: idsListIsSent,
       },
     },
+    auth: { isAuthenticated },
     phrases: {
       from: primaryLanguage,
       to: secondaryLanguage,
@@ -153,11 +156,11 @@ const mapStateToProps = (state) => {
 
   return {
     collections,
+    isAuthenticated,
     collectionsQuantity,
     collectionsIdsWithTranslationMap: new Map(
       Object.entries(collectionsIdsWithTranslation)
     ),
-    idsListIsSent,
     translation: {
       primaryLanguage,
       secondaryLanguage,

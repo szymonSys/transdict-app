@@ -51,16 +51,3 @@ export function useCheck(options = { withRadio: false }) {
 
   return [values, handle, reset];
 }
-
-// const submit = useCallback((login, password, values, radio) => {
-//   log(login);
-//   log(password);
-//   log(values);
-//   log(radio);
-//   resetLogin();
-//   resetPassword();
-//   resetValues();
-//   resetRadio();
-// }, []);
-
-// const handleClick = useSubmit(submit);

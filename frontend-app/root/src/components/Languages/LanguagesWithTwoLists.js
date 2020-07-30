@@ -12,6 +12,7 @@ export default function LanguagesWithTwoLists({
     <Languages languages={languages}>
       {({ sortedLanguagesEntries }) => (
         <div>
+          <h2>Languages</h2>
           <h3>Phrase's language</h3>
           <button onClick={handleSetAutoTranslation}>Wykryj język</button>
           <LanguagesList

@@ -3,24 +3,7 @@ import WithTranslate from "../../shared/containers/WithTranslate";
 import WithSwitch from "../../shared/containers/WithSwitch";
 import { connect } from "react-redux";
 
-function TranslatorWithSwitchLanguages({
-  phrase,
-  languages,
-  Translator,
-  AddToCollection,
-}) {
-  const handleChange = (translateValues, setTranslateValues, event) => {
-    const newTranslateValues = { phrase: event.target.value };
-    if (!event.target.value?.length && translateValues.translation?.length) {
-      newTranslateValues.translation = "";
-    }
-    if (translateValues.autoTranslation && translateValues.from !== null) {
-      newTranslateValues.from = null;
-      newTranslateValues.autoTranslation = false;
-    }
-    setTranslateValues(newTranslateValues);
-  };
-
+function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
   const handleReverse = ({
     translateValues,
     reverseCurrentLanguages,
@@ -71,8 +54,11 @@ function TranslatorWithSwitchLanguages({
   };
 
   return (
-    <WithTranslate callback={() => console.log("translation success!")}>
-      {({ translateValues, isLoading, setTranslateValues, translate }) => (
+    <WithTranslate
+      callback={() => console.log("translation success!")}
+      phrases={phrases}
+    >
+      {({ translateValues, isLoading, setTranslateValues, handleChange }) => (
         <WithSwitch primary={"Automatyczne wykrywanie"} secondary={"Angielski"}>
           {({
             switchables: currentLanguages,
@@ -80,15 +66,12 @@ function TranslatorWithSwitchLanguages({
             setSwitchables: setCurrentLanguages,
           }) => (
             <Translator
-              AddToCollection={AddToCollection}
               translateValues={translateValues}
               isLoading={isLoading}
               languages={languages}
               setTranslateValues={setTranslateValues}
               setCurrentLanguages={setCurrentLanguages}
-              handleChange={(event) =>
-                handleChange(translateValues, setTranslateValues, event)
-              }
+              handleChange={handleChange}
               handleReverse={() =>
                 handleReverse({
                   translateValues,
@@ -116,9 +99,8 @@ function TranslatorWithSwitchLanguages({
 }
 
 const mapStateToProps = (state) => ({
-  phrase: state.phrases,
+  phrases: state.phrases,
   languages: state.languages,
-  messages: state.messages,
 });
 
 export default connect(mapStateToProps)(TranslatorWithSwitchLanguages);

@@ -1,10 +1,8 @@
 import React from "react";
-
 import LanguagesWithTwoLists from "../../components/Languages/LanguagesWithTwoLists";
 import AddToCollection from "../../containers/Translations/AddToCollection";
 
 export default function TranslatorWrapperWithAdding({
-  children,
   translateValues,
   isLoading,
   languages,
@@ -17,7 +15,7 @@ export default function TranslatorWrapperWithAdding({
 }) {
   const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
 
-  const { phrase, translation, from, to } = translateValues;
+  const { phrase, translation } = translateValues;
 
   return (
     <div>
@@ -27,10 +25,9 @@ export default function TranslatorWrapperWithAdding({
       <button onClick={handleReverse}>reverse</button>
       <textarea
         disabled="disabled"
-        value={isLoading ? "Loading..." : phrase ? translation : ""}
+        value={`${phrase ? translation : ""}${isLoading ? "..." : ""}`}
       />
       <AddToCollection />
-      <h2>Languages</h2>
       <LanguagesWithTwoLists
         languages={languages}
         setCurrentLanguages={setCurrentLanguages}

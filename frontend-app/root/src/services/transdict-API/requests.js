@@ -80,7 +80,6 @@ export function updateCollection(
 }
 
 export function addCollection(token = null, { name = null } = {}) {
-  console.log(name);
   return handleRequest(getNewCollectionURL(), {
     method: "POST",
     token,

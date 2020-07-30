@@ -1,6 +1,7 @@
 import React from "react";
 import Language from "../../containers/Languages/Language";
 import LanguagesItem from "./LanguagesItem";
+import { checkType } from "../../shared/utils";
 
 export default function LanguagesList({
   languagesEntries,
@@ -9,7 +10,11 @@ export default function LanguagesList({
   which,
 }) {
   const handleClick = (event) => {
-    if (event.target.dataset?.languageName)
+    if (
+      event.target.dataset?.languageName &&
+      checkType("function", setLanguageName) &&
+      (which === 1 || which === 2)
+    )
       setLanguageName(event.target.dataset.languageName, which);
     if (event.target.dataset?.languageKey)
       setLanguageKey(event.target.dataset?.languageKey);

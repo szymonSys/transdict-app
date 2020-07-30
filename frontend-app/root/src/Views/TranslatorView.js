@@ -1,5 +1,4 @@
 import React from "react";
-import Translator from "../containers/Translator";
 import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
 import MainTranslatorWrapper from "../components/Translator/MainTranslatorWrapper";
 

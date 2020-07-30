@@ -1,8 +1,8 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import LoginWithFormHandling from "../containers/Login/LoginWithFormHandling";
-import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
-import MainTranslatorWrapper from "../components/Translator/MainTranslatorWrapper";
+import TranslatorWithRedirection from "../containers/Translator/TranslatorWithRedirection";
+import TranslatorShortcutWrapper from "../components/Translator/TranslatorShortcutWrapper";
 
 export default function LoginView() {
   const location = useLocation();
@@ -10,7 +10,7 @@ export default function LoginView() {
     <div>
       <Link to="/sign-up">sign up</Link>
       <LoginWithFormHandling />
-      <TranslatorWithSwitchLanguages Translator={MainTranslatorWrapper} />
+      <TranslatorWithRedirection Translator={TranslatorShortcutWrapper} />
     </div>
   );
 }

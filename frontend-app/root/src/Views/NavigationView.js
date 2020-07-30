@@ -5,11 +5,9 @@ import MenuButton from "../components/Navigation/MenuButton";
 
 export default function NavigationView(props) {
   return (
-    <div>
-      <Navigation>
-        <MenuButton />
-        <NavItemsList />
-      </Navigation>
-    </div>
+    <Navigation>
+      <MenuButton />
+      <NavItemsList />
+    </Navigation>
   );
 }

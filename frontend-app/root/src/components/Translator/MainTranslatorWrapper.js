@@ -14,20 +14,19 @@ export default function MainTranslatorWrapper({
   setTranslateValues,
 }) {
   const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
+  const { phrase, translation } = translateValues;
+
   return (
     <div>
       <h5>{languageOutputFrom}</h5>
-      <textarea onChange={handleChange} value={translateValues.phrase} />
+      <textarea onChange={handleChange} value={phrase} />
       <button onClick={handleReverse}>reverse</button>
       <h5>{languageOutputTo}</h5>
       <textarea
         disabled={true}
-        value={`${translateValues.phrase ? translateValues.translation : ""}${
-          isLoading ? "..." : ""
-        }`}
+        value={`${phrase ? translation : ""}${isLoading ? "..." : ""}`}
       />
       <UpdateCollectionsSelection />
-      <h2>Languages</h2>
       <LanguagesWithTwoLists
         languages={languages}
         setCurrentLanguages={setCurrentLanguages}
