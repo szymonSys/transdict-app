@@ -16,26 +16,30 @@ import NavigationView from "./Views/NavigationView";
 import LoadingView from "./shared/components/LoadingView";
 import PrivateContent from "./containers/PrivateContent";
 import useAuthentication from "./shared/hooks/useAutentication";
+import GlobalStyles from "./styled-components/GlobalStyles";
 
 function App() {
   const [isAuthenticating] = useAuthentication();
 
   return (
-    <div className="App">
-      <AppBar />
-      <NavigationView />
-      {!isAuthenticating ? (
-        <LoadingView />
-      ) : (
-        <Switch>
-          <Route exact path="/login" component={LoginView} />
-          <Route exact path="/sign-up" component={RegisterView} />
-          <Route exact path="/translator" component={TranslatorView} />
-          <PrivateRoute path="/" component={PrivateContent} />
-          <Redirect to="/translator" />
-        </Switch>
-      )}
-    </div>
+    <>
+      <GlobalStyles />
+      <div className="App">
+        <AppBar />
+        <NavigationView />
+        {!isAuthenticating ? (
+          <LoadingView />
+        ) : (
+          <Switch>
+            <Route exact path="/login" component={LoginView} />
+            <Route exact path="/sign-up" component={RegisterView} />
+            <Route exact path="/translator" component={TranslatorView} />
+            <PrivateRoute path="/" component={PrivateContent} />
+            <Redirect to="/translator" />
+          </Switch>
+        )}
+      </div>
+    </>
   );
 }
 

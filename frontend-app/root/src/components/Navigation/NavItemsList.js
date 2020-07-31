@@ -1,22 +1,11 @@
 import React from "react";
-import NavItem from "./NavItem";
-import styled from "styled-components";
-import { animated } from "react-spring";
-import { Link } from "react-router-dom";
-
-const NavItems = styled(animated.ul)`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-evenly;
-  width: 100%;
-  height: 80%;
-  font-size: 16;
-  font-weight: bold;
-  list-style: none;
-`;
-
-const StyledNavItem = styled(animated.li)``;
+import { checkType } from "../../shared/utils";
+import {
+  StyledNavItemsList,
+  StyledNavLink,
+  AnimatedButton,
+  AnimatedNavItem,
+} from "../../styled-components/Navigation";
 
 export default function NavItemsList({
   transitions,
@@ -24,40 +13,47 @@ export default function NavItemsList({
   isAuthenticated,
 }) {
   return (
-    <NavItems>
-      {console.log(transitions)}
+    <StyledNavItemsList>
       {transitions
         .filter(
-          ({ item }) =>
-            !item.authRequired || (item.authRequired && isAuthenticated)
+          ({ item: { authRequired, onlyForGuest } }) =>
+            (!authRequired && !onlyForGuest) ||
+            (authRequired && isAuthenticated && !onlyForGuest) ||
+            (onlyForGuest && !isAuthenticated)
         )
-        .map(({ item, key, props }) => {
-          console.log(
-            item.name,
-            !item.authRequired || (item.authRequired && isAuthenticated)
-          );
-          if (item.type === "link")
-            return (
-              <StyledNavItem
-                onClick={setNavIsNotVisible}
-                key={key}
-                style={props}
-              >
-                <Link to={item.path}>{item.name}</Link>
-              </StyledNavItem>
-            );
-          if (item.type === "button")
-            return (
-              <button
-                onClick={() => {
-                  item.action();
-                  setNavIsNotVisible();
-                }}
-              >
-                {item.name}
-              </button>
-            );
-        })}
-    </NavItems>
+        .map(
+          ({
+            item: { type, name, path, action, withoutClose },
+            key,
+            props,
+          }) => {
+            if (type === "link")
+              return (
+                <AnimatedNavItem
+                  onClick={setNavIsNotVisible}
+                  key={key}
+                  style={props}
+                >
+                  <StyledNavLink exact to={path}>
+                    {name}
+                  </StyledNavLink>
+                </AnimatedNavItem>
+              );
+            if (type === "button")
+              return (
+                <AnimatedButton
+                  key={key}
+                  style={props}
+                  onClick={() => {
+                    checkType("function", action) && action();
+                    !withoutClose && setNavIsNotVisible();
+                  }}
+                >
+                  {name}
+                </AnimatedButton>
+              );
+          }
+        )}
+    </StyledNavItemsList>
   );
 }

@@ -81,10 +81,8 @@ function CollectionsList({
                 />
               ))}
             </div>
-            <div style={{ height: 1 }} ref={ref} />
-            <h2 style={{ position: "fixed", bottom: 0 }}>
-              {isLoading ? "Loading..." : ""}
-            </h2>
+            <div ref={ref}></div>
+            <h2 style={{ bottom: 0 }}>{isLoading ? "Loading..." : ""}</h2>
           </div>
         )}
       </WithInfiniteScroll>

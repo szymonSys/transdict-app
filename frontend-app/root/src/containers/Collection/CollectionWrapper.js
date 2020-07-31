@@ -115,7 +115,7 @@ function CollectionWrapper({
                 <Translation key={translation.id} translation={translation} />
               ))}
             </div>
-            <div style={{ height: 1 }} ref={ref} />
+            <div ref={ref} />
             <h2 style={{ position: "fixed", bottom: 0 }}>
               {isLoading ? "Loading..." : ""}
             </h2>

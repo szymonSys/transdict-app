@@ -1,45 +1,24 @@
 import React, { useState, useCallback, useRef } from "react";
 import NavItemsList from "../../components/Navigation/NavItemsList";
-import MenuButton from "../../components/Navigation/MenuButton";
-import { useParams } from "react-router-dom";
-import { useTransition, useSpring, animated, useChain } from "react-spring";
+import { useTransition, useSpring, useChain } from "react-spring";
 import { connect } from "react-redux";
-import styled from "styled-components";
+import store from "../../store";
+import { logout } from "../../actions/auth";
+import {
+  StyledMenuBtn,
+  StyledNav,
+  StyledNavBackground,
+} from "../../styled-components/Navigation";
 
-const MenuBtn = styled(animated.button)`
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  width: 60px;
-  height: 25px;
-  z-index: 99;
-`;
-
-const StyledNav = styled(animated.nav)`
-  display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 30%;
-  height: 100vh;
-  margin: 0;
-  background-color: white;
-  z-index: 11;
-`;
-
-const NavBackground = styled(animated.div)`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.8);
-  z-index: -1;
-`;
-
-const items = [
+const navItems = [
+  {
+    type: "button",
+    action: () => console.log("action"),
+    key: "add-colleciot-button",
+    name: "Dodaj kolekcje",
+    authRequired: true,
+    withoutClose: true,
+  },
   {
     type: "link",
     key: "translator-link",
@@ -53,20 +32,38 @@ const items = [
     path: "/collections",
     authRequired: true,
   },
-  { type: "link", key: "login-link", name: "Log In", path: "/login" },
+  {
+    type: "link",
+    key: "login-link",
+    name: "Log in",
+    path: "/login",
+    onlyForGuest: true,
+  },
+  {
+    type: "link",
+    key: "signup-link",
+    name: "Sign up",
+    path: "/sign-up",
+    onlyForGuest: true,
+  },
   {
     type: "button",
-    action: () => console.log("action"),
-    key: "add-colleciot-link",
-    name: "Dodaj kolekcje",
-    authRequired: false,
+    action: () => store.dispatch(logout()),
+    key: "loggout-button",
+    name: "Log out",
+    authRequired: true,
   },
 ];
 
-function Navigation({ children, isAuthenticated }) {
+function Navigation({ isAuthenticated }) {
   const [navIsVisible, setVisibility] = useState(false);
 
-  const onClick = useCallback(() => setVisibility((state) => !state), []);
+  const toggleVisibility = useCallback(
+    () => setVisibility((state) => !state),
+    []
+  );
+
+  const setNavIsNotVisible = () => navIsVisible && setVisibility(false);
 
   const transRef = useRef();
   const springRef = useRef();
@@ -87,11 +84,11 @@ function Navigation({ children, isAuthenticated }) {
   });
 
   const navItemsTranslations = useTransition(
-    navIsVisible ? items : [],
+    navIsVisible ? navItems : [],
     (item) => item.key,
     {
       ref: transRef,
-      trail: 200 / items.length,
+      trail: 200 / navItems.length,
       unique: true,
       from: {
         opacity: 0,
@@ -138,32 +135,27 @@ function Navigation({ children, isAuthenticated }) {
     const [transition] = transitions;
     const { props, key } = transition;
     return (
-      <NavBackground
+      <StyledNavBackground
+        onClick={setNavIsNotVisible}
         key={key}
         style={{ backgroundColor, ...props }}
-      ></NavBackground>
+      />
     );
   };
 
   return (
     <div>
-      <button onClick={onClick}>show</button>
-      {/* {backgroundTransitions.map(({ props, key }) => (
-        <NavBackground
-          key={key}
-          style={{ backgroundColor, ...props }}
-        ></NavBackground>
-      ))} */}
+      <button onClick={toggleVisibility}>show</button>
       {performTransition(backgroundTransitions)}
       <StyledNav
         style={{
           transform,
         }}
       >
-        <MenuBtn onClick={onClick}>hide</MenuBtn>
+        <StyledMenuBtn onClick={toggleVisibility}>hide</StyledMenuBtn>
         <NavItemsList
           transitions={navItemsTranslations}
-          setNavIsNotVisible={() => setVisibility(false)}
+          setNavIsNotVisible={setNavIsNotVisible}
           isAuthenticated={isAuthenticated}
         />
       </StyledNav>
