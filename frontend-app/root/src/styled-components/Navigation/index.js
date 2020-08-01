@@ -47,7 +47,6 @@ export const StyledNavItemsList = styled(animated.ul)`
   font-size: 20px;
   margin: 0 50px 0 0;
   font-weight: bold;
-  list-style: none;
 `;
 
 export const AnimatedNavItem = styled(animated.li)``;
@@ -62,7 +61,6 @@ export const StyledNavLink = styled(NavLink).attrs({ activeClassName })`
     font-size: 22px;
     font-weight: 700;
   }
-  text-decoration: none;
   color: #555555;
   font-weight: 600;
 `;

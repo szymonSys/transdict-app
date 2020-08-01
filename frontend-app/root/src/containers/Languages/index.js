@@ -1,8 +1,10 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { connect } from "react-redux";
 import { getLanguages } from "../../actions/languages";
 
 function Languages({ children, languages, getLanguages }) {
+  const [isOpen, setIsOpen] = useState(false);
+
   useEffect(() => {
     getLanguages();
   }, []);
@@ -14,12 +16,14 @@ function Languages({ children, languages, getLanguages }) {
     return languagesEntries;
   };
 
+  const toggleIsOpen = () => setIsOpen((currentIsOpen) => !currentIsOpen);
+
   const sortedLanguagesEntries = useMemo(
     () => sortLanguages(languages.languages),
     []
   );
 
-  return children({ sortedLanguagesEntries });
+  return children({ sortedLanguagesEntries, isOpen, toggleIsOpen });
 }
 
 const mapDispatchToProps = (dispatch) => ({
