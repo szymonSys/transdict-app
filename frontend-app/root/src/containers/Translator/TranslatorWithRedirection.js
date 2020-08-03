@@ -1,12 +1,8 @@
 import React from "react";
-import Languages from "../Languages";
-import LanguagesList from "../../components/Languages/LanguagesList";
 import WithTranslate from "../../shared/containers/WithTranslate";
 import WithRedirection from "../../shared/containers/WithRedirection";
 import { connect } from "react-redux";
-import useRedirection from "../../shared/hooks/useRedirection";
 import { resetPhrase } from "../../actions/phrases";
-import { useEffect } from "react";
 
 function TranslatorWithRedirection({
   resetTranslation,
@@ -27,26 +23,16 @@ function TranslatorWithRedirection({
           didMountCallback={resetTranslation}
         >
           {() => (
-            <div>
-              <h4>to: {languages.languages.get(translateValues.to)?.name}</h4>
-              <textarea
-                onChange={handleChange}
-                value={translateValues.phrase}
-              />
-              <span>{isLoading && "Loading..."}</span>
-              <h2>Languages</h2>
-              <Languages languages={languages}>
-                {({ sortedLanguagesEntries }) => (
-                  <div>
-                    <h3>Translation's language</h3>
-                    <LanguagesList
-                      setLanguageKey={(key) => setTranslateValues({ to: key })}
-                      languagesEntries={sortedLanguagesEntries}
-                    />
-                  </div>
-                )}
-              </Languages>
-            </div>
+            <Translator
+              phrase={translateValues.phrase}
+              isLoading={isLoading}
+              languages={languages}
+              handleChange={handleChange}
+              setTranslateValues={setTranslateValues}
+              currentLanguage={
+                languages.languages.get(translateValues.to)?.name
+              }
+            />
           )}
         </WithRedirection>
       )}

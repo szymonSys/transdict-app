@@ -1,15 +1,14 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { connect } from "react-redux";
 import { checkType } from "../../shared/utils";
-import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
-import UpdateCollection from "./UpdateCollection";
+import UpdateCollectionSectionWrapper from "../../components/Collection/UpdateCollectionsSectionWrapper";
+
 import {
   getUserCollections,
   getCollectionsWithForwardTranslationIds,
   clearCollectionsWithForwardTranslationIds,
 } from "../../actions/collections";
 import { addTranslation, deleteTranslation } from "../../actions/translations";
-import AddCollection from "../../containers/Collection/AddCollection";
 
 function UpdateCollectionsSelection({
   collections,
@@ -33,7 +32,7 @@ function UpdateCollectionsSelection({
     secondaryLanguage,
   } = translation;
 
-  const handleClick = async (event) => {
+  const handleAction = async (event) => {
     const { actionType, translationId, collectionId } = event.target.dataset;
 
     let actionIsExecuted = false;
@@ -80,58 +79,17 @@ function UpdateCollectionsSelection({
   );
 
   return (
-    <div>
-      {!isVisible && (
-        <button disabled={!checkCanOpen()} onClick={() => setVisibility(true)}>
-          add do collection
-        </button>
-      )}
-      {isVisible && (
-        <WithInfiniteScroll
-          callback={() => getCollections()}
-          executionOptions={{
-            condition: () => collections.length < collectionsQuantity,
-            withPreload: !collections.length ? true : false,
-            deps: [collections.length, collectionsQuantity],
-          }}
-        >
-          {(ref, isLoading) => (
-            <div
-              style={{
-                height: "20vh",
-                position: "fixed",
-                backgroundColor: "white",
-                width: "100%",
-                overflow: "scroll",
-              }}
-            >
-              <AddCollection />
-              <button onClick={() => setVisibility(false)}>close</button>
-              <ul
-                onClick={handleClick}
-                style={{ marginBottom: 80, height: "100%" }}
-              >
-                {collections.map((collection) => {
-                  const collectionIdString = collection.id.toString();
-                  return (
-                    <UpdateCollection
-                      key={collection.id}
-                      collectionId={collection.id}
-                      translationId={collectionsIdsWithTranslationMap.get(
-                        collectionIdString
-                      )}
-                      collectionName={collection.name}
-                    />
-                  );
-                })}
-              </ul>
-              <div style={{ height: 1 }} ref={ref} />
-              <h2>{isLoading ? "..." : ""}</h2>
-            </div>
-          )}
-        </WithInfiniteScroll>
-      )}
-    </div>
+    <UpdateCollectionSectionWrapper
+      isVisible={isVisible}
+      setIsVisible={() => setVisibility(true)}
+      setIsNotVisible={() => setVisibility(false)}
+      checkCanOpen={checkCanOpen}
+      collections={collections}
+      collectionsQuantity={collectionsQuantity}
+      handleAction={handleAction}
+      collectionsIdsWithTranslationMap={collectionsIdsWithTranslationMap}
+      getCollections={getCollections}
+    />
   );
 }
 

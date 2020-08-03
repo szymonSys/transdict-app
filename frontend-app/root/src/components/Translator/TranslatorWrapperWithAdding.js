@@ -1,6 +1,16 @@
 import React from "react";
 import LanguagesWithTwoLists from "../../components/Languages/LanguagesWithTwoLists";
 import AddToCollection from "../../containers/Translations/AddToCollection";
+import {
+  StyledTranslatorWrapperWithAdding,
+  StyledLanguageInputsWrapperWithAdding,
+  StyledCurrentLanguage,
+  StyledSmallReverseBtn,
+  StyledLanguageWrapperWithAdding,
+  StyledLanguageOptionsWrapper,
+  SmallerLanguageInput,
+} from "../../styled-components/Translator";
+import { ReactComponent as ReverseSVG } from "../../img/svg/018-sort.svg";
 
 export default function TranslatorWrapperWithAdding({
   translateValues,
@@ -12,28 +22,49 @@ export default function TranslatorWrapperWithAdding({
   setCurrentLanguagesOutput,
   setCurrentLanguages,
   setTranslateValues,
+  currentLanguages,
 }) {
   const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
 
-  const { phrase, translation } = translateValues;
+  const { phrase, translation, from, to, autoTranslation } = translateValues;
 
   return (
-    <div>
-      <h4>from: {languageOutputFrom}</h4>
-      <h4>to: {languageOutputTo}</h4>
-      <textarea onChange={handleChange} value={phrase} />
-      <button onClick={handleReverse}>reverse</button>
-      <textarea
-        disabled="disabled"
-        value={`${phrase ? translation : ""}${isLoading ? "..." : ""}`}
-      />
+    <StyledTranslatorWrapperWithAdding>
+      <StyledLanguageInputsWrapperWithAdding>
+        <StyledLanguageWrapperWithAdding>
+          <StyledCurrentLanguage>{languageOutputFrom}</StyledCurrentLanguage>
+          <SmallerLanguageInput
+            placeholder={"wpisz frazę..."}
+            onChange={handleChange}
+            value={phrase}
+          />
+        </StyledLanguageWrapperWithAdding>
+        <StyledLanguageOptionsWrapper>
+          <LanguagesWithTwoLists
+            languages={languages}
+            setCurrentLanguages={setCurrentLanguages}
+            handleSetAutoTranslation={handleSetAutoTranslation}
+            setTranslateValues={setTranslateValues}
+            currentLanguages={currentLanguages}
+            isAuto={!from || autoTranslation}
+          />
+          <StyledSmallReverseBtn
+            disabled={!from || from === to}
+            onClick={handleReverse}
+          >
+            <ReverseSVG />
+          </StyledSmallReverseBtn>
+        </StyledLanguageOptionsWrapper>
+        <StyledLanguageWrapperWithAdding>
+          <StyledCurrentLanguage>{languageOutputTo}</StyledCurrentLanguage>
+          <SmallerLanguageInput
+            placeholder={"tłumaczenie..."}
+            disabled={true}
+            value={`${phrase ? translation : ""}${isLoading ? "..." : ""}`}
+          />
+        </StyledLanguageWrapperWithAdding>
+      </StyledLanguageInputsWrapperWithAdding>
       <AddToCollection />
-      <LanguagesWithTwoLists
-        languages={languages}
-        setCurrentLanguages={setCurrentLanguages}
-        handleSetAutoTranslation={handleSetAutoTranslation}
-        setTranslateValues={setTranslateValues}
-      />
-    </div>
+    </StyledTranslatorWrapperWithAdding>
   );
 }

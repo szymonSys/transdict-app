@@ -66,6 +66,7 @@ function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
             setSwitchables: setCurrentLanguages,
           }) => (
             <Translator
+              currentLanguages={currentLanguages}
               translateValues={translateValues}
               isLoading={isLoading}
               languages={languages}

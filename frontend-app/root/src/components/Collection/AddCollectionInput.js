@@ -1,4 +1,6 @@
 import React from "react";
+import {} from "../../styled-components/Translator";
+import { ReactComponent as AddCollectionSVG } from "../../img/svg/add-1.svg";
 
 export default function AddCollectionInput({
   toggleIsHidden,
@@ -14,7 +16,9 @@ export default function AddCollectionInput({
       {isHidden || (
         <div>
           <input type="text" ref={setRef} id={"just-div"} />
-          <button onClick={addCollection}>Add</button>
+          <button onClick={addCollection}>
+            <AddCollectionSVG />
+          </button>
         </div>
       )}
     </div>

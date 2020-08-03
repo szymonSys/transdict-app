@@ -1,10 +1,11 @@
 import React from "react";
 import Languages from "../../containers/Languages";
-import LanguagesList from "../Languages/LanguagesList";
+import LanguagesList from "../../containers/Languages/LanguagesList";
 
 export default function LanguagesWithOneList({
   languages,
   setTranslateValues,
+  currentLanguage,
 }) {
   return (
     <Languages languages={languages}>
@@ -20,6 +21,7 @@ export default function LanguagesWithOneList({
                   <LanguagesList
                     setLanguageKey={(key) => setTranslateValues({ to: key })}
                     languagesEntries={sortedLanguagesEntries}
+                    currentLanguage={currentLanguage}
                   />
                 </div>
               )}

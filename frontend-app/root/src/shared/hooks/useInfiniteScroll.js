@@ -31,9 +31,7 @@ const useInfiniteScroll = (actionCallback, executionOptions) => {
       intersectionObserver.current && intersectionObserver.current.disconnect();
 
       intersectionObserver.current = new IntersectionObserver(([entrie]) => {
-        console.log(entrie.isIntersecting, !!shouldExecute);
         if (entrie.isIntersecting && !!shouldExecute) {
-          console.log("execute");
           setLoading(true);
           actionCallback();
         }

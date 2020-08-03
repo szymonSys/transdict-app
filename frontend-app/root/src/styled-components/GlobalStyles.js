@@ -43,10 +43,11 @@ const GlobalStyles = createGlobalStyle`
     background-color: transparent;
     text-decoration: none;
     outline: none;
+    resize: none;
     cursor: pointer;
 
     &:disabled {
-      background: #eeeeee;
+      background-color: transparent;
       color: #bbbbbb;
       border-color: #cccccc
     }

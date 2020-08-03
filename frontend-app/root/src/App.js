@@ -1,17 +1,9 @@
 import React from "react";
-import {
-  Redirect,
-  Switch,
-  Route,
-  useHistory,
-  useLocation,
-  useParams,
-} from "react-router-dom";
+import { Redirect, Switch, Route } from "react-router-dom";
 import PrivateRoute from "./shared/components/PrivateRoute";
 import LoginView from "./Views/LoginView";
 import RegisterView from "./Views/RegisterView";
 import TranslatorView from "./Views/TranslatorView";
-import AppBar from "./Views/AppBar";
 import NavigationView from "./Views/NavigationView";
 import LoadingView from "./shared/components/LoadingView";
 import PrivateContent from "./containers/PrivateContent";
@@ -25,7 +17,6 @@ function App() {
     <>
       <GlobalStyles />
       <div className="App">
-        <AppBar />
         <NavigationView />
         {!isAuthenticating ? (
           <LoadingView />

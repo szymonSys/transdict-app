@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState } from "react";
 import PasswordVisibilitySwitch from "../../components/PasswordVisibilitySwitch";
 import SubmitButton from "./SubmitButton";
 import Hint from "./Hint";
-import { useLocation } from "react-router-dom";
 
 const UserForm = ({
   handleChange,

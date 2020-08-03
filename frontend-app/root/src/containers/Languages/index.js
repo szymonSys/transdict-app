@@ -5,10 +5,6 @@ import { getLanguages } from "../../actions/languages";
 function Languages({ children, languages, getLanguages }) {
   const [isOpen, setIsOpen] = useState(false);
 
-  useEffect(() => {
-    getLanguages();
-  }, []);
-
   const sortLanguages = (languages) => {
     if (!languages) return;
     const languagesEntries = Array.from(languages);
@@ -16,12 +12,16 @@ function Languages({ children, languages, getLanguages }) {
     return languagesEntries;
   };
 
-  const toggleIsOpen = () => setIsOpen((currentIsOpen) => !currentIsOpen);
+  const toggleIsOpen = () => setIsOpen((isOpen) => !isOpen);
 
   const sortedLanguagesEntries = useMemo(
-    () => sortLanguages(languages.languages),
+    () => sortLanguages(languages?.languages),
     []
   );
+
+  useEffect(() => {
+    getLanguages();
+  }, []);
 
   return children({ sortedLanguagesEntries, isOpen, toggleIsOpen });
 }

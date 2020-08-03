@@ -1,6 +1,5 @@
 import React from "react";
-import Language from "../../containers/Languages/Language";
-import LanguagesItem from "./LanguagesItem";
+import LanguagesListWrapper from "../../components/Languages/LanguagesListWrapper";
 import { checkType } from "../../shared/utils";
 
 export default function LanguagesList({
@@ -8,8 +7,9 @@ export default function LanguagesList({
   setLanguageKey,
   setLanguageName,
   which,
+  currentLanguage,
 }) {
-  const handleClick = (event) => {
+  const setLanguage = (event) => {
     if (
       event.target.dataset?.languageName &&
       checkType("function", setLanguageName) &&
@@ -20,18 +20,13 @@ export default function LanguagesList({
       setLanguageKey(event.target.dataset?.languageKey);
   };
 
+  const checkIsCurrent = (language) => language === currentLanguage;
+
   return (
-    <ul onClick={handleClick}>
-      {languagesEntries.map((entry) => {
-        const [key, value] = entry;
-        return (
-          <Language key={key} languageKey={key} languageName={value?.name}>
-            {(setRef) => (
-              <LanguagesItem setRef={setRef} language={value?.name} />
-            )}
-          </Language>
-        );
-      })}
-    </ul>
+    <LanguagesListWrapper
+      languagesEntries={languagesEntries}
+      handleClick={setLanguage}
+      checkIsCurrent={checkIsCurrent}
+    />
   );
 }

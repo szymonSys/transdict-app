@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import { addTranslation } from "../../actions/translations";
+import { ReactComponent as AddToCollectionSVG } from "../../img/svg/004-plus.svg";
+import { StyledAddToCollectionBtn } from "../../styled-components/Translator";
 
 function AddToCollection({ phrases, addTranslation }) {
   const { id: collectionId } = useParams();
@@ -30,9 +32,9 @@ function AddToCollection({ phrases, addTranslation }) {
   }, [phrase, translation, from, to]);
 
   return (
-    <button disabled={!canAdd} onClick={handleClick}>
-      Add
-    </button>
+    <StyledAddToCollectionBtn disabled={!canAdd} onClick={handleClick}>
+      <AddToCollectionSVG />
+    </StyledAddToCollectionBtn>
   );
 }
 

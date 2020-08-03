@@ -1,6 +1,6 @@
 import React from "react";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
-import Collection from "./Collection";
+import CollectionsListWrapper from "../../components/Collection/CollectionsListWrapper";
 import useMessage from "../../shared/hooks/useMessage";
 import useAction from "../../shared/hooks/useAction";
 
@@ -42,7 +42,7 @@ function CollectionsList({
   const checkIfFetchedCollections = () =>
     collections.length < collectionsQuantity;
 
-  const handleClick = (event) => {
+  const handleDeleteCollection = (event) => {
     const { collectionId, action } = event?.target?.dataset;
 
     if (!checkType("string", collectionId) || action !== "delete_collection")
@@ -68,22 +68,13 @@ function CollectionsList({
         }}
       >
         {(ref, isLoading) => (
-          <div>
-            <div
-              onClick={handleClick}
-              style={{ marginBottom: 80, minHeight: isLoading ? 1000 : 0 }}
-            >
-              {collections.map((collection) => (
-                <Collection
-                  key={collection.id}
-                  collection={collection}
-                  url={`${url}/${collection.name}/${collection.id}`}
-                />
-              ))}
-            </div>
-            <div ref={ref}></div>
-            <h2 style={{ bottom: 0 }}>{isLoading ? "Loading..." : ""}</h2>
-          </div>
+          <CollectionsListWrapper
+            handleClick={handleDeleteCollection}
+            observedRef={ref}
+            isLoading={isLoading}
+            collections={collections}
+            url={url}
+          />
         )}
       </WithInfiniteScroll>
     </div>

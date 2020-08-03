@@ -4,11 +4,8 @@ import { useTransition, useSpring, useChain } from "react-spring";
 import { connect } from "react-redux";
 import store from "../../store";
 import { logout } from "../../actions/auth";
-import {
-  StyledMenuBtn,
-  StyledNav,
-  StyledNavBackground,
-} from "../../styled-components/Navigation";
+import { StyledNavBackground } from "../../styled-components/Navigation";
+import NavigationWrapper from "../../components/Navigation/NavigationWrapper";
 
 const navItems = [
   {
@@ -83,7 +80,7 @@ function Navigation({ isAuthenticated }) {
     },
   });
 
-  const navItemsTranslations = useTransition(
+  const navItemsTransitions = useTransition(
     navIsVisible ? navItems : [],
     (item) => item.key,
     {
@@ -112,13 +109,13 @@ function Navigation({ isAuthenticated }) {
       ref: trans2Ref,
       unique: true,
       from: {
-        zIndex: 0,
-      },
-      enter: {
         zIndex: 1,
       },
+      enter: {
+        zIndex: 2,
+      },
       leave: {
-        zIndex: 0,
+        zIndex: 1,
       },
     }
   );
@@ -144,22 +141,14 @@ function Navigation({ isAuthenticated }) {
   };
 
   return (
-    <div>
-      <button onClick={toggleVisibility}>show</button>
-      {performTransition(backgroundTransitions)}
-      <StyledNav
-        style={{
-          transform,
-        }}
-      >
-        <StyledMenuBtn onClick={toggleVisibility}>hide</StyledMenuBtn>
-        <NavItemsList
-          transitions={navItemsTranslations}
-          setNavIsNotVisible={setNavIsNotVisible}
-          isAuthenticated={isAuthenticated}
-        />
-      </StyledNav>
-    </div>
+    <NavigationWrapper
+      toggleVisibility={toggleVisibility}
+      transform={transform}
+      performTransition={() => performTransition(backgroundTransitions)}
+      navItemsTransitions={navItemsTransitions}
+      setNavIsNotVisible={setNavIsNotVisible}
+      isAuthenticated={isAuthenticated}
+    />
   );
 }
 

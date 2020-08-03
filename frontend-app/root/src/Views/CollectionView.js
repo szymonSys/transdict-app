@@ -1,5 +1,5 @@
 import React from "react";
-import CollectionWrapper from "../containers/Collection/CollectionWrapper";
+import TranslationsFromCollection from "../containers/Translations/TranslationsFromCollection";
 import TranslationsSorting from "../containers/Translations/TranslationsSorting";
 import Sorting from "../shared/containers/Sorting";
 import TranslatorWithSwitchLanguages from "../containers/Translator/TranslatorWithSwitchLanguages";
@@ -12,10 +12,7 @@ export default function CollectionView() {
 
   return (
     <div>
-      <p>Collection menu component</p>
-      <p>add translate and add new phrase component</p>
       <h1>{collectionName}</h1>
-
       <Link to={`${url}/flashcards`}>{"learn ->"}</Link>
 
       <TranslatorWithSwitchLanguages Translator={TranslatorWrapperWithAdding} />
@@ -30,7 +27,7 @@ export default function CollectionView() {
           />
         )}
       </TranslationsSorting>
-      <CollectionWrapper />
+      <TranslationsFromCollection />
     </div>
   );
 }

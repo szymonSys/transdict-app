@@ -1,7 +1,6 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import Navigation from "../containers/Navigation";
-import NavItemsList from "../components/Navigation/NavItemsList";
+import React from "react";
+import { StyledAppLogo } from "../styled-components/Navigation";
 
-export default function AppLogo(props) {
-  return <h2>TransDict</h2>;
+export default function AppLogo() {
+  return <StyledAppLogo>TransDict</StyledAppLogo>;
 }

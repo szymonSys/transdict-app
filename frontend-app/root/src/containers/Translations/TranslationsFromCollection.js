@@ -1,13 +1,13 @@
 import React from "react";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
-import Translation from "../Translations/Translation";
+import CollectionWrapper from "../../components/Collection/CollectionWrapper";
 import useMessage from "../../shared/hooks/useMessage";
 import useAction from "../../shared/hooks/useAction";
 
 import { connect } from "react-redux";
 import { useParams } from "react-router-dom";
 import { deleteMessage } from "../../actions/messages";
-import { checkType, isNaN } from "../../shared/utils";
+import { checkType } from "../../shared/utils";
 
 import {
   CHECK_TRANSLATION,
@@ -24,7 +24,7 @@ import {
 } from "../../actions/translations";
 import { translate } from "../../services/text-translate-API/requests";
 
-function CollectionWrapper({
+function TranslationsFromCollection({
   getTranslations,
   deleteTranslation,
   checkTranslation,
@@ -55,7 +55,7 @@ function CollectionWrapper({
   const checkIfFetchedTranslations = () =>
     translations.length < translationsQuantity;
 
-  const handleClick = (event) => {
+  const handleAction = (event) => {
     const { translationId, action } = event?.target?.dataset;
 
     if (!checkType("string", translationId)) return;
@@ -83,46 +83,25 @@ function CollectionWrapper({
   ]);
 
   return (
-    <div>
-      {checkType("number", learnedQuantity, translationsQuantity) &&
-        !isNaN(learnedQuantity) &&
-        !isNaN(translationsQuantity) && (
-          <p>
-            {learnedQuantity}/{translationsQuantity} ---{" "}
-            {`${
-              translationsQuantity
-                ? ((learnedQuantity / translationsQuantity) * 100).toFixed()
-                : 0
-            }%`}
-          </p>
-        )}
-      <WithInfiniteScroll
-        callback={() => getTranslations(collectionId)}
-        executionOptions={{
-          condition: checkIfFetchedTranslations,
-          withPreload: !translations.length ? true : false,
-          deps: [translations.length, translationsQuantity],
-        }}
-      >
-        {(ref, isLoading) => (
-          <div>
-            <div
-              onClick={handleClick}
-              style={{ marginBottom: 80, minHeight: isLoading ? "100vh" : 0 }}
-            >
-              {" "}
-              {translations.map((translation) => (
-                <Translation key={translation.id} translation={translation} />
-              ))}
-            </div>
-            <div ref={ref} />
-            <h2 style={{ position: "fixed", bottom: 0 }}>
-              {isLoading ? "Loading..." : ""}
-            </h2>
-          </div>
-        )}
-      </WithInfiniteScroll>
-    </div>
+    <WithInfiniteScroll
+      callback={() => getTranslations(collectionId)}
+      executionOptions={{
+        condition: checkIfFetchedTranslations,
+        withPreload: !translations.length ? true : false,
+        deps: [translations.length, translationsQuantity],
+      }}
+    >
+      {(ref, isLoading) => (
+        <CollectionWrapper
+          handleAction={handleAction}
+          translations={translations}
+          learnedQuantity={learnedQuantity}
+          translationsQuantity={translationsQuantity}
+          observedRef={ref}
+          isLoading={isLoading}
+        />
+      )}
+    </WithInfiniteScroll>
   );
 }
 
@@ -149,4 +128,7 @@ const mapDispatchToProps = (dispatch) => ({
   clearTranslations: () => dispatch(clearTranslations()),
 });
 
-export default connect(mapStateToProps, mapDispatchToProps)(CollectionWrapper);
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(TranslationsFromCollection);
