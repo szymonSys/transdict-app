@@ -8,7 +8,7 @@ import {
 } from "../../actions/phrases";
 import store from "../../store";
 
-export default function useTranslate(phrases, callback = null) {
+export default function useTranslate(phrases, { preReset, callback }) {
   const {
     phrase,
     translation,
@@ -74,6 +74,10 @@ export default function useTranslate(phrases, callback = null) {
       }
     }
   }, [phrase]);
+
+  useEffect(() => {
+    !!preReset && store.dispatch(resetPhraseAction());
+  }, []);
 
   return {
     translateValues: phrases,

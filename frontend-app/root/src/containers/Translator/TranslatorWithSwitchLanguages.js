@@ -59,7 +59,13 @@ function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
       phrases={phrases}
     >
       {({ translateValues, isLoading, setTranslateValues, handleChange }) => (
-        <WithSwitch primary={"Automatyczne wykrywanie"} secondary={"Angielski"}>
+        <WithSwitch
+          primary={
+            languages.languages.get(translateValues.from)?.name ||
+            "Automatyczne wykrywanie"
+          }
+          secondary={languages.languages.get(translateValues.to)?.name}
+        >
           {({
             switchables: currentLanguages,
             reverse: reverseCurrentLanguages,

@@ -1,12 +1,15 @@
+import { useLocation } from "react-router-dom";
 import useTranslate from "../hooks/useTranslate";
 
 export default function WithTranslate({ children, callback, phrases }) {
+  const location = useLocation();
+
   const {
     translateValues,
     isLoading,
     setPhraseProps: setTranslateValues,
     translate,
-  } = useTranslate(phrases, callback);
+  } = useTranslate(phrases, { callback });
 
   const handleChange = (event) => {
     const newTranslateValues = { phrase: event.target.value };
