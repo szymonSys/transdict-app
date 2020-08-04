@@ -20,6 +20,10 @@ function Languages({ children, languages, getLanguages }) {
   );
 
   useEffect(() => {
+    document.body.style.overflowY = isOpen ? "hidden" : "scroll";
+  }, [isOpen]);
+
+  useEffect(() => {
     getLanguages();
   }, []);
 

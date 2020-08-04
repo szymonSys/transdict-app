@@ -1,12 +1,10 @@
 import React from "react";
+import { StyledLanguageItem } from "../../styled-components/Languages";
 
 export default function LanguagesItem({ language, setRef, isCurrent }) {
   return (
-    <li
-      style={{ fontWeight: isCurrent ? 700 : 400, cursor: "pointer" }}
-      ref={setRef}
-    >
+    <StyledLanguageItem isCurrent={isCurrent} ref={setRef}>
       {language}
-    </li>
+    </StyledLanguageItem>
   );
 }

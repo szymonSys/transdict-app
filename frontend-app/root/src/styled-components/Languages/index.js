@@ -2,7 +2,14 @@ import styled from "styled-components";
 import { colors, fontSizes } from "../stylesValues";
 import { animated } from "react-spring";
 
-const { mainBlue, mainPurple, mainWhite, mainGreen } = colors;
+const {
+  mainBlue,
+  mainPurple,
+  mainRed,
+  mainWhite,
+  mainGreen,
+  mainYellow,
+} = colors;
 const { m, l } = fontSizes;
 
 export const LanguagesWrapper = styled.div`
@@ -85,8 +92,65 @@ export const StyledListsWrapper = styled.div`
 
 export const StyledBtnCloseWrapper = styled.div`
   display: flex;
+  position: relative;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
   padding: 10px;
+`;
+
+export const StyledCloseBtn = styled.button`
+  position: fixed;
+  transform: translate(80%, 80%);
+  width: 25px;
+  height: 25px;
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 10px;
+  &:disabled {
+    background-color: transparent;
+  }
+  & > svg {
+    width: 100%;
+    height: 100%;
+  }
+`;
+
+export const StyledAutoTranslationBtn = styled.button`
+  margin: 0 auto;
+  padding: 10px 15px;
+  background-color: ${mainWhite};
+  color: ${mainPurple};
+  border: 1px solid ${mainPurple};
+  &:disabled {
+    color: #bbbbbb;
+    background-color: transparent;
+    border-color: #bbbbbb;
+  }
+  &:hover {
+    color: ${(props) => (props.disabled ? "#bbbbbb" : mainWhite)};
+    background-color: ${(props) => (props.disabled ? mainWhite : mainPurple)};
+    border-color: ${(props) => (props.disabled ? "#bbbbbb" : mainWhite)};
+    cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
+  }
+`;
+
+export const StyledListHeader = styled.p`
+  font-family: "Raleway", sans-serif;
+  margin: 30px auto 20px;
+  font-size: 22px;
+  font-weight: 600;
+  color: ${({ which }) => (which === 2 ? "#00acb3" : "#00ab5e")};
+`;
+
+export const StyledLanguageItem = styled.li`
+  margin: 0 10px 20px;
+  cursor: pointer;
+  font-size: ${({ isCurrent }) => (isCurrent ? "20px" : "inherit")};
+  font-weight: ${({ isCurrent }) => (isCurrent ? 700 : 400)};
+`;
+
+export const StyledLanguageList = styled.ul`
+  padding: 10px 10px 20px;
 `;

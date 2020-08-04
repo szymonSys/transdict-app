@@ -9,8 +9,12 @@ import {
   StyledLanguagesListWrapper,
   StyledListsWrapper,
   StyledBtnCloseWrapper,
+  StyledCloseBtn,
+  StyledAutoTranslationBtn,
+  StyledListHeader,
 } from "../../styled-components/Languages";
 import { ReactComponent as LanguagesSVG } from "../../img/svg/034-translate-1.svg";
+import { ReactComponent as CloseSVG } from "../../img/svg/001-close.svg";
 
 export default function LanguagesWithTwoLists({
   languages,
@@ -28,13 +32,18 @@ export default function LanguagesWithTwoLists({
           <LanguagesWrapper>
             <StyledListsWrapper>
               <StyledBtnCloseWrapper>
-                <button onClick={toggleIsOpen}>close</button>
+                <StyledCloseBtn onClick={toggleIsOpen}>
+                  <CloseSVG />
+                </StyledCloseBtn>
               </StyledBtnCloseWrapper>
               <StyledLanguagesListWrapper>
-                <h3>Język frazy</h3>
-                <button disabled={isAuto} onClick={handleSetAutoTranslation}>
+                <StyledListHeader>Język frazy</StyledListHeader>
+                <StyledAutoTranslationBtn
+                  disabled={isAuto}
+                  onClick={handleSetAutoTranslation}
+                >
                   Wykryj język
-                </button>
+                </StyledAutoTranslationBtn>
                 <LanguagesList
                   setLanguageName={setCurrentLanguages}
                   setLanguageKey={(key) => setTranslateValues({ from: key })}
@@ -44,7 +53,7 @@ export default function LanguagesWithTwoLists({
                 />
               </StyledLanguagesListWrapper>
               <StyledLanguagesListWrapper>
-                <h3>Język tłumaczenia</h3>
+                <StyledListHeader which={2}>Język tłumaczenia</StyledListHeader>
                 <LanguagesList
                   setLanguageName={setCurrentLanguages}
                   setLanguageKey={(key) => setTranslateValues({ to: key })}
