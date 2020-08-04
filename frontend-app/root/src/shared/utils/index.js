@@ -51,3 +51,10 @@ export const shuffle = (array) =>
         },
         [...array]
       );
+
+export const checkIsOdd = (number) => !(number % 2);
+
+export const checkIsTopFactory = (initialIsTopValue = true) => {
+  let isTop = !!initialIsTopValue;
+  return (number) => (!checkIsOdd(number) ? isTop : ((isTop = !isTop), !isTop));
+};

@@ -1,7 +1,11 @@
 import React from "react";
 import LanguagesWithOneList from "../Languages/LanguagesWithOneList";
-import { StyledTranslatorShortcutWrapper } from "../../styled-components/Translator";
-import { ReactComponent as ReverseSVG } from "../../img/svg/018-sort.svg";
+import {
+  StyledTranslatorShortcutWrapper,
+  StyledCurrentLanguage,
+  SmallestLanguageInput,
+  LanguageSelectionWrapper,
+} from "../../styled-components/Translator";
 
 export default function TranslatorShortcutWrapper({
   phrase,
@@ -12,15 +16,25 @@ export default function TranslatorShortcutWrapper({
   setTranslateValues,
 }) {
   return (
-    <div>
-      <h5>{currentLanguage}</h5>
-      <textarea onChange={handleChange} value={phrase} />
-      <span>{isLoading && "Loading..."}</span>
-      <LanguagesWithOneList
-        languages={languages}
-        setTranslateValues={setTranslateValues}
-        currentLanguage={currentLanguage}
+    <StyledTranslatorShortcutWrapper>
+      <LanguageSelectionWrapper>
+        <LanguagesWithOneList
+          languages={languages}
+          setTranslateValues={setTranslateValues}
+          currentLanguage={currentLanguage}
+        />
+        <StyledCurrentLanguage>
+          <span>Tłumacz na: </span>
+          {currentLanguage}
+        </StyledCurrentLanguage>
+      </LanguageSelectionWrapper>
+
+      <SmallestLanguageInput
+        onChange={handleChange}
+        value={phrase}
+        placeholder={"wpisz frazę..."}
       />
-    </div>
+      <span>{isLoading && "Loading..."}</span>
+    </StyledTranslatorShortcutWrapper>
   );
 }

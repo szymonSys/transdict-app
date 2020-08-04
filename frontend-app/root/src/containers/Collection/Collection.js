@@ -2,7 +2,7 @@ import React, { useRef, useEffect } from "react";
 
 import CollectionItem from "../../components/Collection/CollectionItem";
 
-export default function Collection({ collection, url }) {
+export default function Collection({ collection, url, isOdd, isTop }) {
   const deleteBtnRef = useRef();
 
   useEffect(() => {
@@ -15,6 +15,8 @@ export default function Collection({ collection, url }) {
       url={url}
       collection={collection}
       deleteBtnRef={deleteBtnRef}
+      isOdd={isOdd}
+      isTop={isTop}
     />
   );
 }

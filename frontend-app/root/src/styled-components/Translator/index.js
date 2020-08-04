@@ -21,8 +21,20 @@ export const StyledMainTranslatorWrapper = styled.div`
 export const StyledTranslatorShortcutWrapper = styled(
   StyledMainTranslatorWrapper
 )`
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
   min-height: 200px;
   max-height: 400px;
+  max-width: 400px;
+  & > span {
+    display: block;
+    min-width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: 0 auto;
+  }
 `;
 
 export const StyledTranslatorWrapperWithAdding = styled(
@@ -30,6 +42,7 @@ export const StyledTranslatorWrapperWithAdding = styled(
 )`
   min-height: 200px;
   max-height: 400px;
+  max-width: 1024px;
 `;
 
 export const StyledLanguageInputsWrapper = styled.div`
@@ -40,7 +53,7 @@ export const StyledLanguageInputsWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin: 20px 0;
-  @media (min-width: 1024px) {
+  @media (min-width: 720px) {
     flex-direction: row;
   }
 `;
@@ -56,7 +69,7 @@ export const StyledLanguageWrapper = styled.div`
   justify-content: center;
   align-items: center;
   width: 80%;
-  @media (min-width: 1024px) {
+  @media (min-width: 720px) {
     width: 40%;
     min-width: 400px;
   }
@@ -70,8 +83,9 @@ export const StyledLanguageOptionsWrapper = styled.div`
   align-items: center;
   width: 100%;
   margin: 10px 20px;
-  @media (min-width: 1024px) {
+  @media (min-width: 720px) {
     flex-direction: column;
+    width: 80%;
   }
 `;
 
@@ -92,7 +106,7 @@ export const StyledReverseBtn = styled.button`
     opacity: ${(props) => (props.disabled ? 0.3 : 1)};
     cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 720px) {
     transform: rotate(90deg);
   }
 `;
@@ -113,6 +127,10 @@ export const StyledCurrentLanguage = styled.p`
   font-weight: 700;
   padding: 10px;
   text-align: center;
+  & > span {
+    font-weight: 400;
+    color: #00acb3;
+  }
   @media (min-width: 586px) {
     font-size: ${l};
   }
@@ -141,8 +159,25 @@ export const StyledLanguageInput = styled.textarea`
 
 export const SmallerLanguageInput = styled(StyledLanguageInput)`
   height: 70px;
-  @media (min-width: 1024px) {
+  @media (min-width: 720px) {
     min-height: 100px;
+  }
+`;
+
+export const LanguageSelectionWrapper = styled.div`
+  display: flex;
+  flex-wrap: nowrap;
+  width: 100%;
+  align-items: flex-start;
+`;
+
+export const SmallestLanguageInput = styled(StyledLanguageInput)`
+  position: relative;
+  height: 70px;
+  transform: translateY(-40%);
+  @media (min-width: 720px) {
+    min-height: 100px;
+    transform: translateY(-20%);
   }
 `;
 

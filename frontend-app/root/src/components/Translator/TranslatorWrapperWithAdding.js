@@ -25,7 +25,6 @@ export default function TranslatorWrapperWithAdding({
   currentLanguages,
 }) {
   const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
-
   const { phrase, translation, from, to, autoTranslation } = translateValues;
 
   return (

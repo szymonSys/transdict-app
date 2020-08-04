@@ -85,7 +85,7 @@ export const StyledListsWrapper = styled.div`
   overflow-y: scroll;
   font-family: "Lato";
   font-size: 18px;
-  @media (min-width: 420px) {
+  @media (min-width: 565px) {
     width: 60%;
   }
 `;
@@ -101,9 +101,9 @@ export const StyledBtnCloseWrapper = styled.div`
 
 export const StyledCloseBtn = styled.button`
   position: fixed;
-  transform: translate(80%, 80%);
-  width: 25px;
-  height: 25px;
+  transform: translate(0%, 80%);
+  width: 20px;
+  height: 20px;
   background-color: transparent;
   border: none;
   padding: 0;
@@ -115,11 +115,17 @@ export const StyledCloseBtn = styled.button`
     width: 100%;
     height: 100%;
   }
+  @media (min-width: 600px) {
+    width: 25px;
+    height: 25px;
+    transform: translate(80%, 80%);
+  }
 `;
 
 export const StyledAutoTranslationBtn = styled.button`
   margin: 0 auto;
-  padding: 10px 15px;
+  padding: 5px 10px;
+  font-size: 16px;
   background-color: ${mainWhite};
   color: ${mainPurple};
   border: 1px solid ${mainPurple};
@@ -134,23 +140,33 @@ export const StyledAutoTranslationBtn = styled.button`
     border-color: ${(props) => (props.disabled ? "#bbbbbb" : mainWhite)};
     cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
   }
+  @media (min-width: 600px) {
+    font-size: 18px;
+    padding: 10px 15px;
+  }
 `;
 
 export const StyledListHeader = styled.p`
   font-family: "Raleway", sans-serif;
   margin: 30px auto 20px;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 600;
   color: ${({ which }) => (which === 2 ? "#00acb3" : "#00ab5e")};
+  @media (min-width: 600px) {
+    font-size: 22px;
+  }
 `;
 
 export const StyledLanguageItem = styled.li`
   margin: 0 10px 20px;
   cursor: pointer;
-  font-size: ${({ isCurrent }) => (isCurrent ? "20px" : "inherit")};
+  font-size: ${({ isCurrent }) => (isCurrent ? "18px" : "16px")};
   font-weight: ${({ isCurrent }) => (isCurrent ? 700 : 400)};
+  @media (min-width: 600px) {
+    font-size: ${({ isCurrent }) => (isCurrent ? "20px" : "inherit")};
+  }
 `;
 
 export const StyledLanguageList = styled.ul`
-  padding: 10px 10px 20px;
+  padding: 10px 20px 20px;
 `;
