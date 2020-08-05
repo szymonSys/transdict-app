@@ -39,18 +39,9 @@ function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
     setCurrentLanguages(`Automatyczne wykrywanie`, 1);
   };
 
-  const setCurrentLanguagesOutput = (currentLanguages, translateValues) => {
-    const language = languages.languages.get(translateValues.from)?.name;
-    return [
-      `${currentLanguages[0]} ${
-        translateValues.autoTranslation &&
-        translateValues.translation &&
-        language
-          ? " [" + language + "] "
-          : ""
-      }`,
-      `${currentLanguages[1]}`,
-    ];
+  const setPrimaryLanguageName = (langShortcut, isAutoTranslated) => {
+    const primaryLanguageName = languages.languages.get(langShortcut)?.name;
+    return primaryLanguageName || "Automatyczne wykrywanie";
   };
 
   return (
@@ -60,10 +51,7 @@ function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
     >
       {({ translateValues, isLoading, setTranslateValues, handleChange }) => (
         <WithSwitch
-          primary={
-            languages.languages.get(translateValues.from)?.name ||
-            "Automatyczne wykrywanie"
-          }
+          primary={setPrimaryLanguageName(translateValues.from)}
           secondary={languages.languages.get(translateValues.to)?.name}
         >
           {({
@@ -93,9 +81,6 @@ function TranslatorWithSwitchLanguages({ phrases, languages, Translator }) {
                   setCurrentLanguages,
                   setTranslateValues,
                 })
-              }
-              setCurrentLanguagesOutput={() =>
-                setCurrentLanguagesOutput(currentLanguages, translateValues)
               }
             />
           )}

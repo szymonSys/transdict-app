@@ -19,12 +19,11 @@ export default function TranslatorWrapperWithAdding({
   handleChange,
   handleReverse,
   handleSetAutoTranslation,
-  setCurrentLanguagesOutput,
   setCurrentLanguages,
   setTranslateValues,
   currentLanguages,
 }) {
-  const [languageOutputFrom, languageOutputTo] = setCurrentLanguagesOutput();
+  const [languageOutputFrom, languageOutputTo] = currentLanguages;
   const { phrase, translation, from, to, autoTranslation } = translateValues;
 
   return (

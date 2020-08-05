@@ -15,7 +15,7 @@ export const StyledMainTranslatorWrapper = styled.div`
   min-height: 400px;
   width: 100%;
   max-width: 1420px;
-  margin: 0 auto;
+  margin: 120px auto;
 `;
 
 export const StyledTranslatorShortcutWrapper = styled(
@@ -28,6 +28,7 @@ export const StyledTranslatorShortcutWrapper = styled(
   min-height: 200px;
   max-height: 400px;
   max-width: 400px;
+  margin: 0px auto;
   & > span {
     display: block;
     min-width: 20px;
@@ -43,6 +44,8 @@ export const StyledTranslatorWrapperWithAdding = styled(
   min-height: 200px;
   max-height: 400px;
   max-width: 1024px;
+  margin-bottom: 30px;
+  margin: 10px auto;
 `;
 
 export const StyledLanguageInputsWrapper = styled.div`

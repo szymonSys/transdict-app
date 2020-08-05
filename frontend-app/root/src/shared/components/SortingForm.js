@@ -1,19 +1,39 @@
 import React from "react";
+import {
+  StyledSortingWrapper,
+  StyledSortingSelect,
+  StyledSortingOption,
+  StyledReverseOrderBtn,
+} from "../../styled-components/Sorting";
+
+import { ReactComponent as SortReverseSVG } from "../../img/svg/016-right-arrow.svg";
 
 export default function SortingForm({
-  currentSortBy,
-  handleSetSortBy,
+  sortBy,
+  sortDirection,
+  handleSortBy,
   toggleOrder,
   mappedSortingOptions,
 }) {
   return (
-    <div>
-      <select name="sort-by" value={currentSortBy} onChange={handleSetSortBy}>
-        {mappedSortingOptions.map((value) => (
-          <option value={value}>{value}</option>
+    <StyledSortingWrapper>
+      <StyledReverseOrderBtn
+        isDesc={sortDirection === "DESC"}
+        onClick={toggleOrder}
+      >
+        <SortReverseSVG />
+      </StyledReverseOrderBtn>
+      <StyledSortingSelect
+        name="sort-by"
+        value={sortBy}
+        onChange={handleSortBy}
+      >
+        {mappedSortingOptions.map(([sortValue, sortName]) => (
+          <StyledSortingOption value={sortValue}>
+            {sortName}
+          </StyledSortingOption>
         ))}
-      </select>
-      <button onClick={toggleOrder}>Toggle order</button>
-    </div>
+      </StyledSortingSelect>
+    </StyledSortingWrapper>
   );
 }

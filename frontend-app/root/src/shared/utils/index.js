@@ -58,3 +58,30 @@ export const checkIsTopFactory = (initialIsTopValue = true) => {
   let isTop = !!initialIsTopValue;
   return (number) => (!checkIsOdd(number) ? isTop : ((isTop = !isTop), !isTop));
 };
+
+export const compose = (...fn) => (arg) =>
+  fn.reduceRight((result, currentFn) => currentFn(result), arg);
+
+export const mixObjects = (objects) =>
+  Array.isArray(objects)
+    ? objects.reduce(
+        (mixedObject, optionsObject) => ({
+          ...mixedObject,
+          ...optionsObject,
+        }),
+        {}
+      )
+    : checkType("object", objects) && objects !== null
+    ? { ...objects }
+    : {};
+
+export const getUniqueListofObjectValues = (obj) => [
+  ...new Set(Object.values(obj)),
+];
+
+export const getEntriesFromListAndObjectValues = (list) => (obj) =>
+  list.map((value) => [value, obj[value]]);
+
+export const getObjectFromEntries = (entries) => Object.fromEntries(entries);
+
+export const getKeysAndValues = (obj) => [Object.keys(obj), Object.values(obj)];

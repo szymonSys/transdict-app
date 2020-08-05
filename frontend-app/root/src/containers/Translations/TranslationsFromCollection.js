@@ -22,7 +22,6 @@ import {
   resetTranslationsStore,
   clearTranslations,
 } from "../../actions/translations";
-import { translate } from "../../services/text-translate-API/requests";
 
 function TranslationsFromCollection({
   getTranslations,
@@ -34,6 +33,7 @@ function TranslationsFromCollection({
   resetTranslationsStore,
   clearTranslations,
   messages,
+  languages,
 }) {
   const {
     translations,
@@ -75,6 +75,13 @@ function TranslationsFromCollection({
     }
   };
 
+  const mapTranslation = () =>
+    translations.map((translation) => ({
+      ...translation,
+      primaryLanguageName: languages.get(translation.primaryLanguage)?.name,
+      secondaryLanguageName: languages.get(translation.secondaryLanguage)?.name,
+    }));
+
   useAction(() => !isDictMode && toggleMode());
   useAction(() => parseInt(collectionId) !== cId && resetTranslationsStore());
   useAction(() => translations.length && clearTranslations(), [
@@ -94,7 +101,7 @@ function TranslationsFromCollection({
       {(ref, isLoading) => (
         <CollectionWrapper
           handleAction={handleAction}
-          translations={translations}
+          translations={mapTranslation()}
           learnedQuantity={learnedQuantity}
           translationsQuantity={translationsQuantity}
           observedRef={ref}
@@ -108,6 +115,7 @@ function TranslationsFromCollection({
 const mapStateToProps = (state) => ({
   translations: state.translations,
   messages: state.messages,
+  languages: state.languages.languages,
 });
 
 const mapDispatchToProps = (dispatch) => ({

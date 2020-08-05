@@ -23,12 +23,16 @@ export const StyledAppLogo = styled.p`
 `;
 
 export const AppBar = styled.div`
-  position: relative;
+  position: fixed;
+  top: 0;
+  left: 0;
   justify-content: space-between;
   align-items: center;
   height: 80px;
   width: 100%;
   padding: 20px;
+  z-index: 100;
+  background-color: #eeeeee;
   @media (min-width: 420px) {
   }
 `;

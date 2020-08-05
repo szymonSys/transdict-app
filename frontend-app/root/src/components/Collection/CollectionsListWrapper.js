@@ -4,6 +4,8 @@ import { checkIsOdd, checkIsTopFactory } from "../../shared/utils";
 import {
   StyledCollectionWrapper,
   StyledCollectionList,
+  StyledLoadingBar,
+  StyledInfoBar,
 } from "../../styled-components/Collections";
 
 export default function CollectionsWrapper({
@@ -19,7 +21,7 @@ export default function CollectionsWrapper({
     <StyledCollectionWrapper>
       <StyledCollectionList
         onClick={handleClick}
-        style={{ marginBottom: 80, minHeight: isLoading ? 1000 : 0 }}
+        style={{ minHeight: isLoading ? 1000 : 0 }}
       >
         {collections?.length ? (
           collections.map((collection, index) => (
@@ -32,15 +34,15 @@ export default function CollectionsWrapper({
             />
           ))
         ) : (
-          <p>
+          <StyledInfoBar>
             {isLoading
               ? "Wczytywanie..."
               : "Nie masz jeszcze żadnej kolekcji :("}
-          </p>
+          </StyledInfoBar>
         )}
       </StyledCollectionList>
+      <StyledLoadingBar>{isLoading ? ". . ." : ""}</StyledLoadingBar>
       <div ref={observedRef}></div>
-      <h2 style={{ bottom: 0 }}>{isLoading ? "Loading..." : ""}</h2>
     </StyledCollectionWrapper>
   );
 }

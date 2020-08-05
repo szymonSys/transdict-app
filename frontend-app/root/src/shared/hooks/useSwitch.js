@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 
 export default function useSwitch(defaultState = [null, null]) {
   if (!Array.isArray(defaultState) || defaultState.length !== 2)
@@ -19,6 +19,15 @@ export default function useSwitch(defaultState = [null, null]) {
       else if (which === 2) setState([state[0], newState]);
     },
     [state[0], state[1]]
+  );
+
+  useEffect(
+    () => {
+      setNewState(defaultState);
+    },
+    Array.isArray(defaultState) && defaultState.length === 2
+      ? [...defaultState]
+      : []
   );
 
   return [[...state], reverse, setNewState];

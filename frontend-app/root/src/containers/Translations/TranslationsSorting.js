@@ -1,15 +1,16 @@
+import React from "react";
+import SortingForm from "../../shared/components/SortingForm";
 import { connect } from "react-redux";
 import { setSortBy, toggleOrder } from "../../actions/translations";
-import { TRANSLATIONS_SORT_OPTIONS } from "../../services/transdict-API/actionsTypes";
+import Sorting from "../../shared/components/Sorting";
 
-function TranslationsSorting({ children, setSortBy, toggleOrder, sortBy }) {
-  const sortingOptions = TRANSLATIONS_SORT_OPTIONS;
-  return children({ setSortBy, toggleOrder, sortBy, sortingOptions });
-}
+const TranslationsSorting = ({ component = SortingForm, ...rest }) => (
+  <Sorting component={component} {...rest} />
+);
 
 const mapStateToProps = (state) => ({
-  sortBy: state.collections.sortBy,
-  sortDirection: state.collections.sortDirection,
+  sortBy: state.translations.sortBy,
+  sortDirection: state.translations.sortDirection,
 });
 
 const mapDispatchToProps = (dispatch) => ({
