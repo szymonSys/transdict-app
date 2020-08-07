@@ -6,8 +6,8 @@ import { COLLECTIONS_SORT_OPTIONS } from "../services/transdict-API/actionsTypes
 
 export default function MyCollectionsView() {
   return (
-    <div>
-      <h1>My Collections</h1>
+    <div style={{ paddingTop: 100 }}>
+      <h1>Kolekcje</h1>
       <AddCollection />
       <CollectionsSorting sortingOptionsObjects={COLLECTIONS_SORT_OPTIONS} />
       <CollectionsList />

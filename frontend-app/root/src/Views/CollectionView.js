@@ -11,7 +11,7 @@ export default function CollectionView() {
   const { url } = useRouteMatch();
 
   return (
-    <div>
+    <div style={{ paddingTop: 100 }}>
       <h1>{collectionName}</h1>
       <Link to={`${url}/flashcards`}>{"learn ->"}</Link>
       <TranslatorWithSwitchLanguages Translator={TranslatorWrapperWithAdding} />

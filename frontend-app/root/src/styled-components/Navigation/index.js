@@ -10,13 +10,16 @@ export const StyledAppLogo = styled.p`
   position: absolute;
   left: 50%;
   top: 20px;
-  color: ${mainBlue};
+  color: #00acb3;
   font-family: "Montserrat", sans-serif;
   font-size: ${xxl};
   background-color: transparent;
   font-weight: 700;
   transform: translate(-40%, -10%);
   overflow: hidden;
+  & > span {
+    color: #00ab5e;
+  }
   @media (min-width: 420px) {
     transform: translate(-50%, -10%);
   }
@@ -113,7 +116,7 @@ const activeClassName = "nav-item-active";
 
 export const StyledNavLink = styled(NavLink).attrs({ activeClassName })`
   &.${activeClassName} {
-    color: ${mainPurple};
+    color: #00acb3;
     font-size: 22px;
     font-weight: 700;
   }

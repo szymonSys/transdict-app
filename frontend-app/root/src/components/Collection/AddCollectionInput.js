@@ -1,6 +1,12 @@
 import React from "react";
-import {} from "../../styled-components/Translator";
-import { ReactComponent as AddCollectionSVG } from "../../img/svg/add-1.svg";
+import {
+  StyledAddCollectionBtn,
+  AddCollectionWrapper,
+  AddColectionInputWrapper,
+  StyledAddInput,
+  StyledNewCollectionBtn,
+} from "../../styled-components/Collections";
+import { ReactComponent as HideSVG } from "../../img/svg/017-next.svg";
 
 export default function AddCollectionInput({
   toggleIsHidden,
@@ -9,18 +15,21 @@ export default function AddCollectionInput({
   setRef,
 }) {
   return (
-    <div>
-      <button onClick={() => toggleIsHidden((isHidden) => !isHidden)}>
-        {isHidden ? "New collection" : "hidden"}
-      </button>
+    <AddCollectionWrapper isHidden={isHidden}>
+      <StyledNewCollectionBtn
+        isHidden={isHidden}
+        onClick={() => toggleIsHidden((isHidden) => !isHidden)}
+      >
+        {isHidden ? "Nowa kolekcja" : <HideSVG />}
+      </StyledNewCollectionBtn>
       {isHidden || (
-        <div>
-          <input type="text" ref={setRef} id={"just-div"} />
-          <button onClick={addCollection}>
-            <AddCollectionSVG />
-          </button>
-        </div>
+        <AddColectionInputWrapper>
+          <StyledAddInput type="text" ref={setRef} id={"just-div"} />
+          <StyledAddCollectionBtn onClick={addCollection}>
+            Dodaj kolekcję
+          </StyledAddCollectionBtn>
+        </AddColectionInputWrapper>
       )}
-    </div>
+    </AddCollectionWrapper>
   );
 }

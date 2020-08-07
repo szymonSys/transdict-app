@@ -152,7 +152,7 @@ export const CheckboxLabel = styled.span`
   margin-right: 5px;
 `;
 
-export const StyledDeleteBtn = styled(DeleteBtn)`
+export const StyledDeleteBtn = styled.button`
   width: 20px;
   height: 20px;
   position: absolute;
@@ -160,6 +160,16 @@ export const StyledDeleteBtn = styled(DeleteBtn)`
   bottom: 20px;
   left: auto;
   right: 20px;
+  padding: 0;
+  background-color: transparent;
+  border: none;
+  z-index: 1;
+  & > svg {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
 `;
 
 export const StyledTranslationItem = styled.div`

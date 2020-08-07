@@ -1,7 +1,6 @@
 import React from "react";
 import WithInfiniteScroll from "../../shared/containers/WithInfiniteScroll";
-import UpdateCollection from "../../containers/Collection/UpdateCollection";
-import AddCollection from "../../containers/Collection/AddCollection";
+import UpdateCollectionsSection from "./UpdateCollectionSection";
 import { ReactComponent as AddToCollectionSVG } from "../../img/svg/004-plus.svg";
 import { StyledAddToCollectionBtn } from "../../styled-components/Translator";
 
@@ -17,7 +16,7 @@ export default function UpdateCollectionsSectionWrapper({
   collectionsIdsWithTranslationMap,
 }) {
   return (
-    <div>
+    <>
       {!isVisible && (
         <StyledAddToCollectionBtn
           disabled={!checkCanOpen()}
@@ -36,41 +35,19 @@ export default function UpdateCollectionsSectionWrapper({
           }}
         >
           {(ref, isLoading) => (
-            <div
-              style={{
-                height: "20vh",
-                position: "fixed",
-                backgroundColor: "white",
-                width: "100%",
-                overflow: "scroll",
-              }}
-            >
-              <AddCollection />
-              <button onClick={setIsNotVisible}>close</button>
-              <ul
-                onClick={handleAction}
-                style={{ marginBottom: 80, height: "100%" }}
-              >
-                {collections.map((collection) => {
-                  const collectionIdString = collection.id.toString();
-                  return (
-                    <UpdateCollection
-                      key={collection.id}
-                      collectionId={collection.id}
-                      translationId={collectionsIdsWithTranslationMap.get(
-                        collectionIdString
-                      )}
-                      collectionName={collection.name}
-                    />
-                  );
-                })}
-              </ul>
-              <div style={{ height: 1 }} ref={ref} />
-              <h2>{isLoading ? "..." : ""}</h2>
-            </div>
+            <UpdateCollectionsSection
+              setIsNotVisible={setIsNotVisible}
+              collections={collections}
+              handleAction={handleAction}
+              collectionsIdsWithTranslationMap={
+                collectionsIdsWithTranslationMap
+              }
+              isLoading={isLoading}
+              observedRef={ref}
+            />
           )}
         </WithInfiniteScroll>
       )}
-    </div>
+    </>
   );
 }

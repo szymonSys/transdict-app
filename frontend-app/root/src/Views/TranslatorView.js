@@ -5,7 +5,7 @@ import MainTranslatorWrapper from "../components/Translator/MainTranslatorWrappe
 export default function TranslatorView() {
   return (
     <div>
-      {/* <h1>Translator</h1> */}
+      <h1>Tłumacz</h1>
       <TranslatorWithSwitchLanguages Translator={MainTranslatorWrapper} />
     </div>
   );

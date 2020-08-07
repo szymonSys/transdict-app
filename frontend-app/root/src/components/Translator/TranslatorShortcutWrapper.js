@@ -34,7 +34,7 @@ export default function TranslatorShortcutWrapper({
         value={phrase}
         placeholder={"wpisz frazę..."}
       />
-      <span>{isLoading && "Loading..."}</span>
+      <span>{isLoading && ". . ."}</span>
     </StyledTranslatorShortcutWrapper>
   );
 }

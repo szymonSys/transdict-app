@@ -8,14 +8,14 @@ import { StyledNavBackground } from "../../styled-components/Navigation";
 import NavigationWrapper from "../../components/Navigation/NavigationWrapper";
 
 const navItems = [
-  {
-    type: "button",
-    action: () => console.log("action"),
-    key: "add-colleciot-button",
-    name: "Dodaj kolekcje",
-    authRequired: true,
-    withoutClose: true,
-  },
+  // {
+  //   type: "button",
+  //   action: () => console.log("action"),
+  //   key: "add-colleciot-button",
+  //   name: "Dodaj kolekcje",
+  //   authRequired: true,
+  //   withoutClose: true,
+  // },
   {
     type: "link",
     key: "translator-link",
