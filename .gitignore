@@ -1,2 +1,3 @@
 /Pipfile.lock
 /app/__pycache__/
+/frontend-app/root/src/text-translation-api-key.json

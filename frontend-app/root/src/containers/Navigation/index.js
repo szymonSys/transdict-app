@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useRef } from "react";
-import NavItemsList from "../../components/Navigation/NavItemsList";
 import { useTransition, useSpring, useChain } from "react-spring";
 import { connect } from "react-redux";
 import store from "../../store";
@@ -8,38 +7,30 @@ import { StyledNavBackground } from "../../styled-components/Navigation";
 import NavigationWrapper from "../../components/Navigation/NavigationWrapper";
 
 const navItems = [
-  // {
-  //   type: "button",
-  //   action: () => console.log("action"),
-  //   key: "add-colleciot-button",
-  //   name: "Dodaj kolekcje",
-  //   authRequired: true,
-  //   withoutClose: true,
-  // },
   {
     type: "link",
     key: "translator-link",
-    name: "Translator",
+    name: "Tłumacz",
     path: "/translator",
   },
   {
     type: "link",
     key: "collections-link",
-    name: "Collections",
+    name: "Kolekcje",
     path: "/collections",
     authRequired: true,
   },
   {
     type: "link",
     key: "login-link",
-    name: "Log in",
+    name: "Zaloguj się",
     path: "/login",
     onlyForGuest: true,
   },
   {
     type: "link",
     key: "signup-link",
-    name: "Sign up",
+    name: "stwórz konto",
     path: "/sign-up",
     onlyForGuest: true,
   },
@@ -47,7 +38,7 @@ const navItems = [
     type: "button",
     action: () => store.dispatch(logout()),
     key: "loggout-button",
-    name: "Log out",
+    name: "Wyloguj",
     authRequired: true,
   },
 ];
@@ -127,12 +118,12 @@ function Navigation({ isAuthenticated }) {
     [0, navIsVisible ? 0 : 0.1, navIsVisible ? 0.2 : 0.1]
   );
 
-  const performTransition = (transitions) => {
+  const performTransition = (transitions, Component = StyledNavBackground) => {
     if (!transitions || !transitions.length) return;
     const [transition] = transitions;
     const { props, key } = transition;
     return (
-      <StyledNavBackground
+      <Component
         onClick={setNavIsNotVisible}
         key={key}
         style={{ backgroundColor, ...props }}

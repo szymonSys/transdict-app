@@ -1,8 +1,9 @@
 import handleRequest from "../handleRequest";
 import { getLanguagesURL, getTranslateURL } from "./urls";
+import { KEY, REGION } from "../../text-translation-api-key.json";
 
-const API_KEY = "adfba2915b5a496e831b9ba576bb3f65";
-const REGION = "westeurope";
+const API_KEY = "";
+// const REGION = "westeurope";
 
 export const getLanguages = () =>
   handleRequest(getLanguagesURL(), { APIkey: API_KEY, region: REGION });
